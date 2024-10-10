@@ -2,7 +2,6 @@ from pypdf import PdfReader
 import pyttsx3
 from gtts import gTTS
 import tkinter as tk
-from tkinter import filedialog
 import pygame
 
 ## Transformar PDF em TXT
@@ -40,11 +39,19 @@ canvas = tk.Canvas(root, width=150, height=100, bg='white')
 canvas.pack(side="top", padx=10, pady=10)
 
 # Função para tocar o arquivo MP3
+# def play_music():
+#     file_path = filedialog.askopenfilename(filetypes=[("MP3 Files", "*.mp3")])
+#     if file_path:
+#         pygame.mixer.music.load(file_path)
+#         pygame.mixer.music.play()
+
+
+# Inicializando o pygame
+pygame.mixer.init()
+
 def play_music():
-    file_path = filedialog.askopenfilename(filetypes=[("MP3 Files", "*.mp3")])
-    if file_path:
-        pygame.mixer.music.load(file_path)
-        pygame.mixer.music.play()
+    pygame.mixer.music.load('audio2.mp3')
+    pygame.mixer.music.play()
 
 # Botão para selecionar e tocar música
 btn_play = tk.Button(root, text="Tocar MP3", command=play_music)
