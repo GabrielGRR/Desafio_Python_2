@@ -3,6 +3,7 @@ import pyttsx3
 from gtts import gTTS
 import tkinter as tk
 import pygame
+import os
 
 ## Transformar PDF em TXT
 reader = PdfReader("O Programador Pragmatico.pdf") # Caminho relativo
@@ -12,6 +13,7 @@ page = reader.pages[n] # seleciona a página que você quer que seja transcrito
 text = page.extract_text()
 print(text)
 # TODO: ?adicionar buffer da proxima pagina?
+
 
 
 ## Text to Speech (TTS) e 
@@ -41,54 +43,69 @@ root.geometry("400x300")
 #         pygame.mixer.music.load(file_path)
 #         pygame.mixer.music.play()
 
+sound_prev = 'sound/prev.mp3'
+sound_current = 'sound/current.mp3'
+sound_next = 'sound/next.mp3'
 
 # Inicializando o pygame
 pygame.mixer.init()
 
+# Variável para armazenar a posição onde o áudio foi pausado
+paused_position = 0
+is_paused = False  # Variável para verificar se o áudio está pausado
 
-## funções para os botões da interface
-def play_sound():
-    try:
-        pygame.mixer.music.load('sound/current.mp3')
-        pygame.mixer.music.play()
-    except:
-        print("play music failed")
+class sound_player:
 
-def pause_sound():
-    try:
-        pygame.mixer.music.pause()
-    except:
-        print("pause music failed")
+    def __init__(self, prev, current, next):
+        self.prev = prev
+        self.current = current
+        self.next = next
 
-def prev_sound():
-    try:
-        pygame.mixer.music.load('sound/prev.mp3')
-    except:
-        print("prev sound failed")
+    ## funções para os botões da interface
+    def play_sound(self):
+        try:
+            self.sound = pygame.mixer.Sound(self.current)
+            self.sound.play()
+        except:
+            print("play music failed")
 
-def next_sound():
-    try:
-        pygame.mixer.music.load('sound/next.mp3')
-    except:
-        print("next sound failed")
+    def pause_sound():
+        try:
+            pygame.mixer.pause() #não está pausando, está PARANDO
+        except:
+            print("pause music failed")
+
+    def prev_sound():
+        try:
+            pygame.mixer.music.load('sound/prev.mp3')
+        except:
+            print("prev sound failed")
+
+    def next_sound():
+        try:
+            pygame.mixer.music.load('sound/next.mp3')
+        except:
+            print("next sound failed")
 
 
 # input box (escolher pagina)
 # mute
 # slider volume
 
+sound = sound_player(sound_prev,sound_current,sound_next) #### acho que não deu certo o obj
+
 ## Botões
 # fazer este botão virar toggle
-btn_play = tk.Button(root, text="Play", command=play_sound)
+btn_play = tk.Button(root, text="Play", command=sound.play_sound)
 btn_play.grid(row=1, column=1) #pady="20"
 
-btn_pause = tk.Button(root, text="Pause", command=pause_sound)
+btn_pause = tk.Button(root, text="Pause", command=sound.pause_sound)
 btn_pause.grid(row=1, column=2)
 
-btn_next = tk.Button(root, text="Next", command=next_sound)
+btn_next = tk.Button(root, text="Next", command=sound.next_sound)
 btn_next.grid(row=1, column=3)
 
-btn_prev = tk.Button(root, text="Prev", command=prev_sound)
+btn_prev = tk.Button(root, text="Prev", command=sound.prev_sound)
 btn_prev.grid(row=1, column=0)
 
 # Texto
