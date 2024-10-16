@@ -54,58 +54,48 @@ pygame.mixer.init()
 paused_position = 0
 is_paused = False  # Variável para verificar se o áudio está pausado
 
-class sound_player:
+## funções para os botões da interface
+def play_sound():
+    try:
+        sound = pygame.mixer.Sound(sound_current)
+        sound.play()
+    except:
+        print("play music failed")
 
-    def __init__(self, prev, current, next):
-        self.prev = prev
-        self.current = current
-        self.next = next
+def pause_sound():
+    try:
+        pygame.mixer.pause() #não está pausando, está PARANDO
+    except:
+        print("pause music failed")
 
-    ## funções para os botões da interface
-    def play_sound(self):
-        try:
-            self.sound = pygame.mixer.Sound(self.current)
-            self.sound.play()
-        except:
-            print("play music failed")
+def prev_sound():
+    try:
+        pygame.mixer.music.load(sound_prev)
+    except:
+        print("prev sound failed")
 
-    def pause_sound():
-        try:
-            pygame.mixer.pause() #não está pausando, está PARANDO
-        except:
-            print("pause music failed")
-
-    def prev_sound():
-        try:
-            pygame.mixer.music.load('sound/prev.mp3')
-        except:
-            print("prev sound failed")
-
-    def next_sound():
-        try:
-            pygame.mixer.music.load('sound/next.mp3')
-        except:
-            print("next sound failed")
-
+def next_sound():
+    try:
+        pygame.mixer.music.load(sound_next)
+    except:
+        print("next sound failed")
 
 # input box (escolher pagina)
 # mute
 # slider volume
 
-sound = sound_player(sound_prev,sound_current,sound_next) #### acho que não deu certo o obj
-
 ## Botões
 # fazer este botão virar toggle
-btn_play = tk.Button(root, text="Play", command=sound.play_sound)
+btn_play = tk.Button(root, text="Play", command=play_sound)
 btn_play.grid(row=1, column=1) #pady="20"
 
-btn_pause = tk.Button(root, text="Pause", command=sound.pause_sound)
+btn_pause = tk.Button(root, text="Pause", command=pause_sound)
 btn_pause.grid(row=1, column=2)
 
-btn_next = tk.Button(root, text="Next", command=sound.next_sound)
+btn_next = tk.Button(root, text="Next", command=next_sound)
 btn_next.grid(row=1, column=3)
 
-btn_prev = tk.Button(root, text="Prev", command=sound.prev_sound)
+btn_prev = tk.Button(root, text="Prev", command=prev_sound)
 btn_prev.grid(row=1, column=0)
 
 # Texto
