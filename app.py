@@ -18,7 +18,7 @@ print(text)
 
 ## Text to Speech (TTS) e 
 tts = pyttsx3.init()
-tts.save_to_file(text, 'sound/current.mp3')
+tts.save_to_file(text, 'sound/current.wav')
 #tts.say(text) # não salva o MP3, reproduz diretamente
 tts.runAndWait()
 
@@ -44,7 +44,7 @@ root.geometry("400x300")
 #         pygame.mixer.music.play()
 
 sound_prev = 'sound/prev.mp3'
-sound_current = 'sound/current.mp3'
+sound_current = 'sound/current.wav'
 sound_next = 'sound/next.mp3'
 
 # Inicializando o pygame
@@ -56,15 +56,29 @@ is_paused = False  # Variável para verificar se o áudio está pausado
 
 ## funções para os botões da interface
 def play_sound():
+    global is_paused, paused_position
+    
     try:
-        sound = pygame.mixer.Sound(sound_current)
-        sound.play()
-    except:
-        print("play music failed")
+        if is_paused:  # Se o áudio estava pausado, continua de onde parou
+            pygame.mixer.music.unpause()
+            is_paused = False
+        elif not pygame.mixer.music.get_busy():
+            #file_path = tk.filedialog.askopenfilename(filetypes=[("MP3 Files", "*.mp3")])
+            pygame.mixer.music.load(os.path.join("sound", "current.wav"))
+            pygame.mixer.music.play(loops=0, start=paused_position)  # Tocar do ponto onde foi pausado
+            is_paused = False
+
+    except Exception as e:
+        print(f"play music failed: {e}")
 
 def pause_sound():
     try:
-        pygame.mixer.pause() #não está pausando, está PARANDO
+        global is_paused, paused_position
+
+        if pygame.mixer.music.get_busy():  # Se o áudio está tocando
+            pygame.mixer.music.pause()  # Pausa o áudio
+            paused_position = pygame.mixer.music.get_pos() / 1000.0  # Salva a posição atual (em segundos)
+            is_paused = True
     except:
         print("pause music failed")
 
