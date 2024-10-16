@@ -84,12 +84,14 @@ def pause_sound():
 
 def prev_sound():
     try:
+        pygame.mixer.music.unload()
         pygame.mixer.music.load(sound_prev)
     except:
         print("prev sound failed")
 
 def next_sound():
     try:
+        pygame.mixer.music.unload()
         pygame.mixer.music.load(sound_next)
     except:
         print("next sound failed")
