@@ -131,11 +131,11 @@ text_content = " ".join(lines)
 print(text_content)
 
 
-#### TODO: slider volume
+#### TODO: slider volume?
 
 # Criar um slider para a posição do áudio
 audio_lenght = pygame.mixer.Sound("sound/current.wav").get_length()
-audio_slider = tk.Scale(root, from_=0, to=audio_lenght, orient='horizontal',length=500, command=ajustar_posicao)
+audio_slider = tk.Scale(root, from_=0, to=audio_lenght, orient='horizontal',length=500, command=ajustar_posicao, showvalue=0)
 audio_slider.pack(pady=10)
 
 # Frame para alinhar os botões na mesma linha
