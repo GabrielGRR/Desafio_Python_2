@@ -4,6 +4,8 @@ from gtts import gTTS
 import tkinter as tk
 import pygame
 import os
+import time
+import threading
 
 ## Transformar PDF em TXT
 reader = PdfReader("O Programador Pragmatico.pdf") # Caminho relativo
@@ -43,6 +45,19 @@ pygame.mixer.init()
 # Variável para armazenar a posição onde o áudio foi pausado
 paused_position = 0
 is_paused = False  # Variável para verificar se o áudio está pausado
+
+# Função para atualizar a posição do slider enquanto a música toca
+def atualizar_slider_posicao():
+    while pygame.mixer.music.get_busy():  # Enquanto a música estiver tocando
+        pos = pygame.mixer.music.get_pos() / 1000  # Pega a posição atual (em milissegundos) e converte para segundos
+        audio_slider.set(pos)  # Atualiza o slider de posição
+        time.sleep(1)  # Atualiza a cada 1 segundo
+
+# Função para ajustar a posição do áudio
+def ajustar_posicao(val):
+    pos = int(val)  # Pega a posição do slider (em segundos)
+    pygame.mixer.music.play(loops=0, start=pos)  # Reproduz a partir da nova posição
+
 
 ## funções para os botões da interface
 def play_sound():
@@ -118,6 +133,11 @@ print(text_content)
 
 #### TODO: slider volume
 
+# Criar um slider para a posição do áudio
+audio_lenght = pygame.mixer.Sound("sound/current.wav").get_length()
+audio_slider = tk.Scale(root, from_=0, to=audio_lenght, orient='horizontal',length=500, command=ajustar_posicao)
+audio_slider.pack(pady=10)
+
 # Frame para alinhar os botões na mesma linha
 button_frame = tk.Frame(root)
 button_frame.pack(side=tk.BOTTOM)
@@ -126,8 +146,9 @@ button_frame.pack(side=tk.BOTTOM)
 btn_prev = tk.Button(button_frame, text="Prev", command=prev_sound)
 btn_prev.pack(side=tk.LEFT, padx=3)
 
-btn_play_pause = tk.Button(button_frame, text="Play", command=play_sound) # borderwidth = 0 remove a borda
-btn_play_pause.pack(side=tk.LEFT, padx=3) #pady="20"
+# TODO: transformar esse botão em toggle e remover o pause
+btn_play_pause = tk.Button(button_frame, text="Play", command=play_sound)
+btn_play_pause.pack(side=tk.LEFT, padx=3)
 
 btn_pause = tk.Button(button_frame, text="Pause", command=pause_sound)
 btn_pause.pack(side=tk.LEFT, padx=3)
