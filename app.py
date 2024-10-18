@@ -11,25 +11,8 @@ number_of_pages = len(reader.pages) # não obrigatório
 n = 215
 page = reader.pages[n] # seleciona a página que você quer que seja transcrito
 text = page.extract_text()
-lines = text.split()
-
-palavras_linha = 10
-count = 0 
-
-for line in lines:
-    if count == 15:
-        lines.insert(palavras_linha,'\n')
-        count = -1
-    count +=1
-    palavras_linha+=1
-
-text_content = " ".join(lines)
-
-print(text_content)
 
 # TODO: ?adicionar buffer da proxima pagina?
-
-
 
 ## Text to Speech (TTS) e 
 tts = pyttsx3.init()
@@ -41,7 +24,6 @@ tts.runAndWait()
 # tts = gTTS(text, lang='pt')
 # tts.save('audio2.mp3')
 
-
 ## Criando interface gráfica (GUI) com o tkinter
 
 # Criando a janela principal
@@ -50,13 +32,6 @@ root.title("mPD player | PD_f player")
 
 # Definindo o tamanho inicial da janela
 root.geometry("") # fit to content
-
-# Função para tocar o arquivo MP3
-# def play_sound():
-#     file_path = filedialog.askopenfilename(filetypes=[("MP3 Files", "*.mp3")])
-#     if file_path:
-#         pygame.mixer.music.load(file_path)
-#         pygame.mixer.music.play()
 
 sound_prev = 'sound/prev.mp3'
 sound_current = 'sound/current.wav'
@@ -111,28 +86,54 @@ def next_sound():
     except:
         print("next sound failed")
 
-# input box (escolher pagina)
-# mute
-# slider volume
 
 ## Botões
+lines = text.split() 
+palavras_linha = 10  # Quantidade de palavras por linha
+count = 0  # Contador para limitar a criação de frames
+max_words_per_frame = 15  # Quantidade de palavras por frame
+
+# Variável para armazenar o frame atual
+text_frame = None
+
+for index, line in enumerate(lines):
+    if count == 0:  # Quando o count for 0, cria um novo frame
+        text_frame = tk.Frame(root)
+        text_frame.pack(side=tk.TOP, pady=0)  # Cria um novo frame e empilha
+
+    # Cria um botão com o texto
+    text_container = tk.Button(text_frame, text=line, bd=0, highlightthickness=0, pady=0, width=len(line))
+    text_container.pack(side=tk.LEFT, padx=0, pady=0)  # Adiciona o botão ao frame atual
+
+    count += 1
+
+    # Quando atinge o limite de palavras por frame, reinicia o contador
+    if count == max_words_per_frame:
+        count = 0  # Reseta o contador para criar um novo frame no próximo loop
+
+# TODO: apagar dps?
+text_content = " ".join(lines)
+print(text_content)
+
+
+#### TODO: slider volume
+
+# Frame para alinhar os botões na mesma linha
+button_frame = tk.Frame(root)
+button_frame.pack(side=tk.BOTTOM)
+
 # fazer este botão virar toggle
-btn_play = tk.Button(root, text="Play", command=play_sound)
-btn_play.grid(row=1, column=1) #pady="20"
+btn_prev = tk.Button(button_frame, text="Prev", command=prev_sound)
+btn_prev.pack(side=tk.LEFT, padx=3)
 
-btn_pause = tk.Button(root, text="Pause", command=pause_sound)
-btn_pause.grid(row=1, column=2)
+btn_play_pause = tk.Button(button_frame, text="Play", command=play_sound) # borderwidth = 0 remove a borda
+btn_play_pause.pack(side=tk.LEFT, padx=3) #pady="20"
 
-btn_next = tk.Button(root, text="Next", command=next_sound)
-btn_next.grid(row=1, column=3)
+btn_pause = tk.Button(button_frame, text="Pause", command=pause_sound)
+btn_pause.pack(side=tk.LEFT, padx=3)
 
-btn_prev = tk.Button(root, text="Prev", command=prev_sound)
-btn_prev.grid(row=1, column=0)
-
-# Texto
-tk_text = tk.Label(root, text=text_content).grid(row=0,column=1)
-#tk_text = tk.Label(root, text=text).grid(row=0,column=1)
-
+btn_next = tk.Button(button_frame, text="Next", command=next_sound)
+btn_next.pack(side=tk.LEFT, padx=3)
 
 # Executando a janela
 root.mainloop()
