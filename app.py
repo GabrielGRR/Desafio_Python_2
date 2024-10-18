@@ -11,7 +11,22 @@ number_of_pages = len(reader.pages) # não obrigatório
 n = 215
 page = reader.pages[n] # seleciona a página que você quer que seja transcrito
 text = page.extract_text()
-print(text)
+lines = text.split()
+
+palavras_linha = 10
+count = 0 
+
+for line in lines:
+    if count == 15:
+        lines.insert(palavras_linha,'\n')
+        count = -1
+    count +=1
+    palavras_linha+=1
+
+text_content = " ".join(lines)
+
+print(text_content)
+
 # TODO: ?adicionar buffer da proxima pagina?
 
 
@@ -34,7 +49,7 @@ root = tk.Tk()
 root.title("mPD player | PD_f player")
 
 # Definindo o tamanho inicial da janela
-root.geometry("400x300")
+root.geometry("") # fit to content
 
 # Função para tocar o arquivo MP3
 # def play_sound():
@@ -115,7 +130,7 @@ btn_prev = tk.Button(root, text="Prev", command=prev_sound)
 btn_prev.grid(row=1, column=0)
 
 # Texto
-tk_text = tk.Label(root, text="hello world").grid(row=0,column=1)
+tk_text = tk.Label(root, text=text_content).grid(row=0,column=1)
 #tk_text = tk.Label(root, text=text).grid(row=0,column=1)
 
 
