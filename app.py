@@ -64,14 +64,19 @@ def play_sound():
     global is_paused, paused_position
     
     try:
-        if is_paused:  # Se o áudio estava pausado, continua de onde parou
-            pygame.mixer.music.unpause()
-            is_paused = False
-        elif not pygame.mixer.music.get_busy():
+        if not pygame.mixer.music.get_busy():
             #file_path = tk.filedialog.askopenfilename(filetypes=[("MP3 Files", "*.mp3")])
             pygame.mixer.music.load(os.path.join("sound", "current.wav"))
             pygame.mixer.music.play(loops=0, start=paused_position)  # Tocar do ponto onde foi pausado
+            btn_play_pause.config(text="Pause")  # Atualiza o texto entre "Play" e "Pause"
             is_paused = False
+            # Iniciar a atualização do slider de posição em uma nova thread
+        elif is_paused:  # Se o áudio estava pausado, continua de onde parou
+            pygame.mixer.music.unpause()
+            btn_play_pause.config(text="Pause")  # Atualiza o texto entre "Play" e "Pause"
+            is_paused = False
+        else:
+            pause_sound()
 
     except Exception as e:
         print(f"play music failed: {e}")
@@ -82,6 +87,7 @@ def pause_sound():
 
         if pygame.mixer.music.get_busy():  # Se o áudio está tocando
             pygame.mixer.music.pause()  # Pausa o áudio
+            btn_play_pause.config(text="Play")  # Atualiza o texto entre "Play" e "Pause"
             paused_position = pygame.mixer.music.get_pos() / 1000.0  # Salva a posição atual (em segundos)
             is_paused = True
     except:
@@ -149,9 +155,6 @@ btn_prev.pack(side=tk.LEFT, padx=3)
 # TODO: transformar esse botão em toggle e remover o pause
 btn_play_pause = tk.Button(button_frame, text="Play", command=play_sound)
 btn_play_pause.pack(side=tk.LEFT, padx=3)
-
-btn_pause = tk.Button(button_frame, text="Pause", command=pause_sound)
-btn_pause.pack(side=tk.LEFT, padx=3)
 
 btn_next = tk.Button(button_frame, text="Next", command=next_sound)
 btn_next.pack(side=tk.LEFT, padx=3)
