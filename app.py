@@ -10,7 +10,7 @@ import threading
 ## Transformar PDF em TXT
 reader = PdfReader("O Programador Pragmatico.pdf") # Caminho relativo
 number_of_pages = len(reader.pages) # não obrigatório
-n = 215
+n = 6
 page = reader.pages[n] # seleciona a página que você quer que seja transcrito
 text = page.extract_text()
 
@@ -42,34 +42,35 @@ sound_next = 'sound/next.mp3'
 # Inicializando o pygame
 pygame.mixer.init()
 
+pygame.mixer.music.load(os.path.join("sound", "current.wav"))
 # Variável para armazenar a posição onde o áudio foi pausado
-paused_position = 0
+
+def paused_position():
+    return pygame.mixer.music.get_pos() / 1000 # Pega a posição atual (em milissegundos) e converte para segundos
+
 is_paused = False  # Variável para verificar se o áudio está pausado
 
 # Função para atualizar a posição do slider enquanto a música toca
 def atualizar_slider_posicao():
+    global is_updating_slider
     while pygame.mixer.music.get_busy():  # Enquanto a música estiver tocando
-        pos = pygame.mixer.music.get_pos() / 1000  # Pega a posição atual (em milissegundos) e converte para segundos
-        audio_slider.set(pos)  # Atualiza o slider de posição
+        audio_slider.set(paused_position())  # Atualiza o slider de posição
         time.sleep(1)  # Atualiza a cada 1 segundo
-
-# Função para ajustar a posição do áudio
-def ajustar_posicao(val):
-    pos = int(val)  # Pega a posição do slider (em segundos)
-    pygame.mixer.music.play(loops=0, start=pos)  # Reproduz a partir da nova posição
-
 
 ## funções para os botões da interface
 def play_sound():
-    global is_paused, paused_position
+    global is_paused
     
     try:
         if not pygame.mixer.music.get_busy():
             #file_path = tk.filedialog.askopenfilename(filetypes=[("MP3 Files", "*.mp3")])
             pygame.mixer.music.load(os.path.join("sound", "current.wav"))
-            pygame.mixer.music.play(loops=0, start=paused_position)  # Tocar do ponto onde foi pausado
+            pos = paused_position()
+            pygame.mixer.music.play(loops=0, start=0)  # Tocar do ponto onde foi pausado
+            audio_slider.set(pos)
             btn_play_pause.config(text="Pause")  # Atualiza o texto entre "Play" e "Pause"
             is_paused = False
+            threading.Thread(target=atualizar_slider_posicao, daemon=True).start()
             # Iniciar a atualização do slider de posição em uma nova thread
         elif is_paused:  # Se o áudio estava pausado, continua de onde parou
             pygame.mixer.music.unpause()
@@ -83,12 +84,13 @@ def play_sound():
 
 def pause_sound():
     try:
-        global is_paused, paused_position
+        global is_paused
 
         if pygame.mixer.music.get_busy():  # Se o áudio está tocando
             pygame.mixer.music.pause()  # Pausa o áudio
             btn_play_pause.config(text="Play")  # Atualiza o texto entre "Play" e "Pause"
-            paused_position = pygame.mixer.music.get_pos() / 1000.0  # Salva a posição atual (em segundos)
+
+            print(paused_position())
             is_paused = True
     except:
         print("pause music failed")
@@ -141,18 +143,17 @@ print(text_content)
 
 # Criar um slider para a posição do áudio
 audio_lenght = pygame.mixer.Sound("sound/current.wav").get_length()
-audio_slider = tk.Scale(root, from_=0, to=audio_lenght, orient='horizontal',length=500, command=ajustar_posicao, showvalue=0)
+audio_slider = tk.Scale(root, from_=0, to=audio_lenght, orient='horizontal',length=500, command=atualizar_slider_posicao, showvalue=0)
 audio_slider.pack(pady=10)
 
 # Frame para alinhar os botões na mesma linha
 button_frame = tk.Frame(root)
 button_frame.pack(side=tk.BOTTOM)
 
-# fazer este botão virar toggle
 btn_prev = tk.Button(button_frame, text="Prev", command=prev_sound)
 btn_prev.pack(side=tk.LEFT, padx=3)
 
-# TODO: transformar esse botão em toggle e remover o pause
+# Play_pause toggle button
 btn_play_pause = tk.Button(button_frame, text="Play", command=play_sound)
 btn_play_pause.pack(side=tk.LEFT, padx=3)
 
