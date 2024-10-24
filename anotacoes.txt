@@ -1,0 +1,27 @@
+https://chatgpt.com/c/670543cb-ad54-8013-b819-7ea106acf4ff
+
+atualizar slide enquanto o som progride
+- threading
+
+ajustar o slider automaticamente
+ao pausar, ele volta para zero
+
+descobrir formas de pressionar o botão, de já pular o slider para a posição requisitada
+- talvez a resposta esteja no for, olhar se tem alguma função do tts que descobre a duração de cada palavra
+
+Arrumar os botões next e prev, criar as funções
+- arrumar os audios para .wav
+
+mudar cor dos botões texto após já ter passado por lá
+
+adicionar buffer da proxima pagina? 
+- threading
+- free memory do som anterior e deletar arquivo .wav
+
+
+
+
+#Baixa prioridade
+olhar questão da linguagem auto traduzir, converter com acento (ptbr, en, uk)
+olhar módulos de dublagem? 
+remover os try except
