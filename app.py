@@ -52,7 +52,10 @@ def paused_position_updater():
     while True:  # Enquanto a música estiver tocando
         paused_pos = pygame.mixer.music.get_pos() / 1000  # Pega a posição atual (em milissegundos) e converte para segundos
         time.sleep(0.2)  # Atualiza a cada 1 segundo
+        audio_slider.set(paused_pos)
         print(paused_pos)
+
+#tkinter scale manually?
 
 def is_playing():
     return pygame.mixer.music.get_busy()
