@@ -50,10 +50,11 @@ paused_pos = 0.0
 def paused_position_updater():
     global paused_pos
     while True:  # Enquanto a música estiver tocando
-        paused_pos = pygame.mixer.music.get_pos() / 1000  # Pega a posição atual (em milissegundos) e converte para segundos
-        time.sleep(0.2)  # Atualiza a cada 1 segundo
-        audio_slider.set(paused_pos)
-        print(paused_pos)
+        time.sleep(0.5)  # Atualiza a cada 1 segundo
+        if is_playing():
+            paused_pos = pygame.mixer.music.get_pos() / 1000  # Pega a posição atual (em milissegundos) e converte para segundos
+            audio_slider.set(paused_pos)
+            print(paused_pos)
 
 #tkinter scale manually?
 
@@ -75,19 +76,15 @@ def play_pause():
             checar_threads()
             music_loaded = True
 
-        if not is_playing():
+        elif not is_playing():
             #file_path = tk.filedialog.askopenfilename(filetypes=[("WAV Files", "*.wav")])
             pygame.mixer.music.unpause()  # Tocar do ponto onde foi pausado
-            audio_slider.set(paused_pos)
             btn_play_pause.config(text="Pause")  # Atualiza o texto entre "Play" e "Pause"
             checar_threads()
 
         else:
-            paused_pos = pygame.mixer.music.get_pos() / 1000
-            pygame.mixer.music.pause()  # Pausa o áudio
-            
+            pygame.mixer.music.pause()  # Pausa o áudio            
             btn_play_pause.config(text="Play")  # Atualiza o texto entre "Play" e "Pause"
-
             print(paused_pos)
             checar_threads()
 
