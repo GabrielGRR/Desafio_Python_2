@@ -45,59 +45,60 @@ pygame.mixer.init()
 pygame.mixer.music.load(os.path.join("sound", "current.wav"))
 # Variável para armazenar a posição onde o áudio foi pausado
 
-def paused_position():
-    return pygame.mixer.music.get_pos() / 1000 # Pega a posição atual (em milissegundos) e converte para segundos
+paused_pos = 0.0
+
+def paused_position_updater():
+    global paused_pos
+    while True:  # Enquanto a música estiver tocando
+        paused_pos = pygame.mixer.music.get_pos() / 1000  # Pega a posição atual (em milissegundos) e converte para segundos
+        time.sleep(0.2)  # Atualiza a cada 1 segundo
+        print(paused_pos)
 
 def is_playing():
     return pygame.mixer.music.get_busy()
 
-#is_updating_slider = False # Variável para controlar a execução da thread
 
-# Função para atualizar a posição do slider enquanto a música toca
-def atualizar_pos_slider(event=None): #event none só para resolver um erro do tkinter
-    #global is_updating_slider
-    #while is_updating_slider and pygame.mixer.music.get_busy():  # Enquanto a música estiver tocando
-    while is_playing():  # Enquanto a música estiver tocando
-        audio_slider.set(paused_position())  # Atualiza o slider de posição
-        time.sleep(1)  # Atualiza a cada 1 segundo
-
-# Função para ajustar a posição do áudio (somente quando o usuário move o slider manualmente)
-def ajustar_posicao():
-    if is_playing():
-        pygame.mixer.music.play(loops=0, start=paused_position())  # Reproduz a partir da nova posição
-        threading.Thread(target=atualizar_pos_slider, daemon=True).start()
+music_loaded = False
 
 ## funções para os botões da interface
-def play_sound():
-    #global is_updating_slider
+def play_pause():
+    global paused_pos, thread_created, music_loaded
     
     try:
+        if not music_loaded: #start music
+            pygame.mixer.music.play(loops=0, start=0)  # Tocar do ponto onde foi pausado
+            btn_play_pause.config(text="Pause")  # Atualiza o texto entre "Play" e "Pause"
+            threading.Thread(target=paused_position_updater, daemon=True).start()
+            checar_threads()
+            music_loaded = True
+
         if not is_playing():
             #file_path = tk.filedialog.askopenfilename(filetypes=[("WAV Files", "*.wav")])
-            pygame.mixer.music.play(loops=0, start=0)  # Tocar do ponto onde foi pausado
-            audio_slider.set(paused_position())
+            pygame.mixer.music.unpause()  # Tocar do ponto onde foi pausado
+            audio_slider.set(paused_pos)
             btn_play_pause.config(text="Pause")  # Atualiza o texto entre "Play" e "Pause"
-            #is_updating_slider = True
-            ##threading.Thread(target=atualizar_pos_slider, daemon=True).start()
-            # Iniciar a atualização do slider de posição em uma nova thread
+            checar_threads()
+
         else:
-            pause_sound()
+            paused_pos = pygame.mixer.music.get_pos() / 1000
+            pygame.mixer.music.pause()  # Pausa o áudio
+            
+            btn_play_pause.config(text="Play")  # Atualiza o texto entre "Play" e "Pause"
+
+            print(paused_pos)
+            checar_threads()
 
     except Exception as e:
         print(f"play music failed: {e}")
 
-def pause_sound():
-    try:
-        #global is_updating_slider
 
-        if is_playing():  # Se o áudio está tocando
-            pygame.mixer.music.pause()  # Pausa o áudio
-            btn_play_pause.config(text="Play")  # Atualiza o texto entre "Play" e "Pause"
-
-            print(paused_position())
-            #is_updating_slider = False  # Para a atualização do slider
-    except:
-        print("pause music failed")
+# Função para verificar quantas threads estão ativas
+def checar_threads():
+    threads_ativas = threading.enumerate()  # Retorna uma lista de threads ativas
+    print(f"Total de threads ativas: {len(threads_ativas)}")
+    print("Lista de threads:")
+    for thread in threads_ativas:
+        print(f"- {thread.name} (daemon: {thread.daemon})")
 
 def prev_sound():
     try:
@@ -147,7 +148,8 @@ print(text_content)
 
 # Criar um slider para a posição do áudio
 audio_lenght = pygame.mixer.Sound("sound/current.wav").get_length()
-audio_slider = tk.Scale(root, from_=0, to=audio_lenght, orient='horizontal',length=500, command=atualizar_pos_slider, showvalue=0)
+print(audio_lenght)
+audio_slider = tk.Scale(root, from_=0, to=audio_lenght, orient='horizontal',length=500,  showvalue=0) #command=atualizar_pos_slider,
 audio_slider.pack(pady=10)
 
 # Frame para alinhar os botões na mesma linha
@@ -158,7 +160,7 @@ btn_prev = tk.Button(button_frame, text="Prev", command=prev_sound)
 btn_prev.pack(side=tk.LEFT, padx=3)
 
 # Play_pause toggle button
-btn_play_pause = tk.Button(button_frame, text="Play", command=play_sound)
+btn_play_pause = tk.Button(button_frame, text="Play", command=play_pause)
 btn_play_pause.pack(side=tk.LEFT, padx=3)
 
 btn_next = tk.Button(button_frame, text="Next", command=next_sound)
