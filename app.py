@@ -1,6 +1,6 @@
 from pypdf import PdfReader
 import pyttsx3
-from gtts import gTTS
+# from gtts import gTTS
 import tkinter as tk
 import pygame
 import os
@@ -47,9 +47,6 @@ pygame.mixer.music.load(os.path.join("sound", "current.wav"))
 
 paused_pos = 0.0
 
-
-#TODO #mudar nome para slider
-
 is_dragging_slider = False
 
 def position_updater(val=None): 
@@ -63,6 +60,8 @@ def position_updater(val=None):
             print(is_dragging_slider)
             checar_threads()
 
+threading.Thread(target=position_updater, daemon=True).start()
+
 #tkinter scale manually?
 # manual_mode = False
 # def slider_updater(val):
@@ -74,17 +73,20 @@ def position_updater(val=None):
 # def slider_click(event):
 #     global is_dragging_slider
 #     is_dragging_slider = True  # O slider está sendo arrastado
-#     pygame.mixer.music.pause()  # Pausa o áudio enquanto arrasta
-#     print(is_playing())
+#     if is_playing():
+#         pygame.mixer.music.pause()  # Pausa o áudio enquanto arrasta
 
 # # Função chamada quando o slider é solto (termina o arrasto)
 # def slider_release(event):
 #     global is_dragging_slider, paused_pos
-#     is_dragging_slider = False  # O slider não está mais sendo arrastado
-#     paused_pos = pygame.mixer.music.get_pos() /1000
-#     audio_slider.set(paused_pos)
-#     pygame.mixer.music.unpause()
+#     if is_dragging_slider:
+#         is_dragging_slider = False  # O slider não está mais sendo arrastado
+#         paused_pos = pygame.mixer.music.get_pos() /1000
+#         audio_slider.set(paused_pos)
+#         pygame.mixer.music.unpause()
 
+
+# threading.Thread(target=slider_click, daemon=True).start()
 
 def is_playing():
     return pygame.mixer.music.get_busy()
@@ -114,7 +116,7 @@ def play_pause():
         else:
             pygame.mixer.music.pause()  # Pausa o áudio            
             btn_play_pause.config(text="Play")  # Atualiza o texto entre "Play" e "Pause"
-            print(paused_pos)
+            print(f"paused at: {paused_pos}")
             checar_threads()
 
     except Exception as e:
@@ -178,12 +180,12 @@ print(text_content)
 # Criar um slider para a posição do áudio
 audio_lenght = pygame.mixer.Sound("sound/current.wav").get_length()
 print(audio_lenght)
-audio_slider = tk.Scale(root, from_=0, to=audio_lenght, orient='horizontal',length=500, sliderlength=20, command=position_updater, showvalue=0)
+
+#como já tem thread ativa, irá dar conflitor se add o command=position_updater
+audio_slider = tk.Scale(root, from_=0, to=audio_lenght, orient='horizontal',length=500, sliderlength=20, showvalue=0) 
 audio_slider.pack(pady=10)
 
-
-
-# Vincular os eventos de clique e soltura no slider
+# # Vincular os eventos de clique e soltura no slider
 # audio_slider.bind("<ButtonPress-1>", slider_click)  # Quando o slider é clicado
 # audio_slider.bind("<ButtonRelease-1>", slider_release)  # Quando o slider é solto
 
@@ -201,8 +203,6 @@ btn_play_pause.pack(side=tk.LEFT, padx=3)
 
 btn_next = tk.Button(button_frame, text="Next", command=next_sound)
 btn_next.pack(side=tk.LEFT, padx=3)
-
-threading.Thread(target=position_updater, daemon=True).start()
 
 # Executando a janela
 root.mainloop()
