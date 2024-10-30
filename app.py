@@ -19,12 +19,12 @@ text = page.extract_text()
 ## Text to Speech (TTS) e 
 tts = pyttsx3.init()
 tts.save_to_file(text, 'sound/current.wav')
-#tts.say(text) # não salva o MP3, reproduz diretamente
+#tts.say(text) # não salva o wav, reproduz diretamente
 tts.runAndWait()
 
 # ALTERNATIVA: google text to speech \/
 # tts = gTTS(text, lang='pt')
-# tts.save('audio2.mp3')
+# tts.save('audio2.wav')
 
 ## Criando interface gráfica (GUI) com o tkinter
 
@@ -35,9 +35,9 @@ root.title("mPD player | PD_f player")
 # Definindo o tamanho inicial da janela
 root.geometry("") # fit to content
 
-sound_prev = 'sound/prev.mp3'
+sound_prev = 'sound/prev.wav'
 sound_current = 'sound/current.wav'
-sound_next = 'sound/next.mp3'
+sound_next = 'sound/next.wav'
 
 # Inicializando o pygame
 pygame.mixer.init()
@@ -51,7 +51,7 @@ is_dragging_slider = False
 
 def paused_pos():
     current_pos = audio_slider.get()
-    pygame.mixer.music.play(loops=0, start=current_pos)
+    # pygame.mixer.music.play(loops=0, start=current_pos)
     return current_pos
 
 def position_updater(val=None): 
@@ -60,16 +60,16 @@ def position_updater(val=None):
         if is_playing() and not is_dragging_slider:
             ######################################################atenção
 
-            pos = pygame.mixer.music.get_pos()/1000  # Pega a posição atual (em milissegundos) e converte para segundos
+            pos = audio_slider.get()+1  # Pega a posição atual (em milissegundos) e converte para segundos
             # audio_slider.set(paused_pos())
             audio_slider.set(pos)
-            print(pygame.mixer.music.get_pos() / 1000)
+            print()
             checar_threads()
 
 threading.Thread(target=position_updater, daemon=True).start()
 
 #tkinter scale manually?
-# manual_mode = False
+# manual_wave = False
 # def slider_updater(val):
 #     audio_slider.set(float(val))
 #     print(f"val é {val}")
@@ -197,7 +197,7 @@ button_frame.pack(side=tk.BOTTOM)
 btn_prev = tk.Button(button_frame, text="Prev", command=prev_sound)
 btn_prev.pack(side=tk.LEFT, padx=3)
 
-# Play_pause toggle button
+# Play_pause twavle button
 btn_play_pause = tk.Button(button_frame, text="Play", command=play_pause)
 btn_play_pause.pack(side=tk.LEFT, padx=3)
 
