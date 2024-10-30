@@ -1,18 +1,15 @@
 https://chatgpt.com/c/670543cb-ad54-8013-b819-7ea106acf4ff
 
-atualizar slide enquanto o som progride
-- threading
-
-ajustar o slider automaticamente
-ao pausar, ele volta para zero
 
 descobrir formas de pressionar o botão, de já pular o slider para a posição requisitada
 - talvez a resposta esteja no for, olhar se tem alguma função do tts que descobre a duração de cada palavra
+- talvez eu tenha que transformar em áudio cada palavra, get_len e dps excluir o  áudio
+
+
 
 Arrumar os botões next e prev, criar as funções
-- arrumar os audios para .wav
 
-mudar cor dos botões texto após já ter passado por lá
+mudar cor dos botão cujo slider esteja passando
 
 adicionar buffer da proxima pagina? 
 - threading

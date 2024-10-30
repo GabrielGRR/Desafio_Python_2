@@ -170,6 +170,84 @@ for index, line in enumerate(lines):
     if count == max_words_per_frame:
         count = 0  # Reseta o contador para criar um novo frame no próximo loop
 
+audio_list = []
+def get_words_lenght_one():
+    global audio_list
+    for word in lines:
+        tts.save_to_file(word, 'sound/test.wav')
+        tts.runAndWait()
+        current_word_lenght = pygame.mixer.Sound("sound/test.wav").get_length()
+        audio_list.append(current_word_lenght)
+        print(f"Word: {word} / lenght {current_word_lenght}\n")
+    print(len(audio_list))
+    print(len(lines))
+    print("a soma dos audios é de:",sum(audio_list))
+
+def get_words_lenght_two(value):
+    global audio_list
+
+    half = int(len(lines)/2)
+    if value == 1:
+        current_text_list = lines[:half]     
+    else:
+        current_text_list = lines[half:]   
+
+    count = 0
+    for word in current_text_list:
+        tts.save_to_file(word, 'sound/test.wav')
+        tts.runAndWait()
+        current_word_lenght = pygame.mixer.Sound("sound/test.wav").get_length()
+        audio_list.append(current_word_lenght)
+        print(count)
+        print(f"Value{value} / Word: {word} / lenght {current_word_lenght}\n")
+        count+=1
+    print(len(audio_list))
+    print(len(lines))
+    print("a soma dos audios é de:",sum(audio_list))
+
+
+def get_words_lenght_four(value):
+    global audio_list
+
+    half = int(len(lines)/2)
+    half_half = int(len(lines)/4)
+
+    if value == 1:
+        current_text_list = lines[:half_half]     
+    elif value == 2:
+        current_text_list = lines[half_half:half]
+    elif value == 3:
+        current_text_list = lines[half:half+half_half]
+    else:  
+        current_text_list = lines[half+half_half:] 
+
+    count = 0
+    for word in current_text_list:
+        tts.save_to_file(word, 'sound/test.wav')
+        tts.runAndWait()
+        current_word_lenght = pygame.mixer.Sound("sound/test.wav").get_length()
+        audio_list.append(current_word_lenght)
+        print(count)
+        print(f"Value{value} / Word: {word} / lenght {current_word_lenght}\n")
+        count+=1
+    print(len(audio_list))
+    print(len(lines))
+    print("a soma dos audios é de:",sum(audio_list))
+
+if len(lines) < 80:
+    threading.Thread(target=get_words_lenght_one, daemon=True).start()
+elif len(lines) < 160:
+    threading.Thread(target=get_words_lenght_two, args=(1,), daemon=True).start()
+    threading.Thread(target=get_words_lenght_two, args=(2,), daemon=True).start()
+else:
+    threading.Thread(target=get_words_lenght_four, args=(1,), daemon=True).start()
+    threading.Thread(target=get_words_lenght_four, args=(2,), daemon=True).start()
+    threading.Thread(target=get_words_lenght_four, args=(3,), daemon=True).start()
+    threading.Thread(target=get_words_lenght_four, args=(4,), daemon=True).start()
+
+
+
+
 # TODO: apagar dps?
 text_content = " ".join(lines)
 print(text_content)
