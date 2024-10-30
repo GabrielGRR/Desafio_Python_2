@@ -45,26 +45,26 @@ pygame.mixer.init()
 pygame.mixer.music.load(os.path.join("sound", "current.wav"))
 # Variável para armazenar a posição onde o áudio foi pausado
 
-paused_pos = 0.0
-
 is_dragging_slider = False
 
 #TODO: o problema é que o paused_pos considera outra instância de audio, a anterior, mesmo atualizando
 
+def paused_pos():
+    current_pos = audio_slider.get()
+    pygame.mixer.music.play(loops=0, start=current_pos)
+    return current_pos
+
 def position_updater(val=None): 
-    global paused_pos
     while True:  # Enquanto a música estiver tocando
         time.sleep(1)  # Atualiza a cada 1 segundo
         if is_playing() and not is_dragging_slider:
-            paused_pos = pygame.mixer.music.get_pos() / 1000  # Pega a posição atual (em milissegundos) e converte para segundos
-            print("##########paused pos:",paused_pos)
-            audio_slider.set(paused_pos)
-            print(paused_pos)
+            ######################################################atenção
+
+            pos = pygame.mixer.music.get_pos()/1000  # Pega a posição atual (em milissegundos) e converte para segundos
+            # audio_slider.set(paused_pos())
+            audio_slider.set(pos)
+            print(pygame.mixer.music.get_pos() / 1000)
             checar_threads()
-        else:
-            audio_slider.set(audio_slider.get())
-            paused_pos = audio_slider.get()
-            time.sleep(1.2)
 
 threading.Thread(target=position_updater, daemon=True).start()
 
@@ -79,18 +79,15 @@ threading.Thread(target=position_updater, daemon=True).start()
 def slider_click(event=None):
     global is_dragging_slider
     is_dragging_slider = True  # O slider está sendo arrastado
-    play_pause()
+    pygame.mixer.music.stop()
+
 
 # Função chamada quando o slider é solto (termina o arrasto)
 def slider_release(event=None):
-    global is_dragging_slider, paused_pos
+    global is_dragging_slider
     if is_dragging_slider:
-        play_pause()
-        paused_pos = audio_slider.get()
-        audio_slider.set(paused_pos)
-        pygame.mixer.music.stop()
-        pygame.mixer.music.play(loops=0, start=paused_pos)  # Tocar do ponto onde foi pausado
-        print("audio slider está em:",audio_slider.get())
+        pygame.mixer.music.play(loops=0, start=paused_pos())  # Tocar do ponto onde foi pausado
+        pygame.mixer.music.set_pos(paused_pos())
         is_dragging_slider = False  # O slider não está mais sendo arrastado
 
 # threading.Thread(target=slider_click, daemon=True).start()
@@ -100,29 +97,27 @@ def is_playing():
 
 music_loaded = False
 
+
+
 ## funções para os botões da interface
 def play_pause():
-    global paused_pos, thread_created, music_loaded
+    global thread_created, music_loaded
     
     try:
         if not music_loaded: #start music
             pygame.mixer.music.play(loops=0, start=0)  # Tocar do ponto onde foi pausado
             btn_play_pause.config(text="Pause")  # Atualiza o texto entre "Play" e "Pause"
-            # threading.Thread(target=position_updater, daemon=True).start()
-            checar_threads()
             music_loaded = True
 
         elif not is_playing():
             #file_path = tk.filedialog.askopenfilename(filetypes=[("WAV Files", "*.wav")])
+            audio_slider.set(paused_pos())
             pygame.mixer.music.unpause()  # Tocar do ponto onde foi pausado
             btn_play_pause.config(text="Pause")  # Atualiza o texto entre "Play" e "Pause"
-            checar_threads()
 
         else:
-            pygame.mixer.music.pause()  # Pausa o áudio            
+            pygame.mixer.music.pause()  # Pausa o áudio   
             btn_play_pause.config(text="Play")  # Atualiza o texto entre "Play" e "Pause"
-            print(f"paused at: {paused_pos}")
-            checar_threads()
 
     except Exception as e:
         print(f"play music failed: {e}")
