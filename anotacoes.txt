@@ -1,21 +1,34 @@
 https://chatgpt.com/c/670543cb-ad54-8013-b819-7ea106acf4ff
 
+############################################################################## MVP: ##############################################################################
+
+remover botões do texto, colocar o text raw
+
+Selecionar página
+- [input caixa] / total de páginas
+- time.sleep(1)
+
+prev_page
+- se next estiver carregado, substituir next pelo current
+
+next_page:
+- buffer 80%
+- threading
+- free memory do som anterior e deletar arquivo .wav
+
+Selecionar PDF
+
+
+############################################################################## Se der tempo: ##############################################################################
+
+adicionar botão toggle de auto skip next
+
+slider de volume?
 
 descobrir formas de pressionar o botão, de já pular o slider para a posição requisitada
 - talvez a resposta esteja no for, olhar se tem alguma função do tts que descobre a duração de cada palavra
 - talvez eu tenha que transformar em áudio cada palavra, get_len e dps excluir o  áudio
-
-
-
-Arrumar os botões next e prev, criar as funções
-
-mudar cor dos botão cujo slider esteja passando
-
-adicionar buffer da proxima pagina? 
-- threading
-- free memory do som anterior e deletar arquivo .wav
-
-
+- mudar cor dos botão cujo slider esteja passando
 
 
 #Baixa prioridade
