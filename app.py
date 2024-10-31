@@ -47,8 +47,6 @@ pygame.mixer.music.load(os.path.join("sound", "current.wav"))
 
 is_dragging_slider = False
 
-#TODO: o problema é que o paused_pos considera outra instância de audio, a anterior, mesmo atualizando
-
 def paused_pos():
     current_pos = audio_slider.get()
     # pygame.mixer.music.play(loops=0, start=current_pos)
@@ -58,29 +56,18 @@ def position_updater(val=None):
     while True:  # Enquanto a música estiver tocando
         time.sleep(1)  # Atualiza a cada 1 segundo
         if is_playing() and not is_dragging_slider:
-            ######################################################atenção
-
             pos = audio_slider.get()+1  # Pega a posição atual (em milissegundos) e converte para segundos
-            # audio_slider.set(paused_pos())
             audio_slider.set(pos)
             print()
             checar_threads()
 
 threading.Thread(target=position_updater, daemon=True).start()
 
-#tkinter scale manually?
-# manual_wave = False
-# def slider_updater(val):
-#     audio_slider.set(float(val))
-#     print(f"val é {val}")
-
-
 # Função chamada quando o slider é clicado (começa o arrasto)
 def slider_click(event=None):
     global is_dragging_slider
     is_dragging_slider = True  # O slider está sendo arrastado
     pygame.mixer.music.stop()
-
 
 # Função chamada quando o slider é solto (termina o arrasto)
 def slider_release(event=None):
@@ -90,14 +77,10 @@ def slider_release(event=None):
         pygame.mixer.music.set_pos(paused_pos())
         is_dragging_slider = False  # O slider não está mais sendo arrastado
 
-# threading.Thread(target=slider_click, daemon=True).start()
-
 def is_playing():
     return pygame.mixer.music.get_busy()
 
 music_loaded = False
-
-
 
 ## funções para os botões da interface
 def play_pause():
@@ -170,94 +153,15 @@ for index, line in enumerate(lines):
     if count == max_words_per_frame:
         count = 0  # Reseta o contador para criar um novo frame no próximo loop
 
-audio_list = []
-def get_words_lenght_one():
-    global audio_list
-    for word in lines:
-        tts.save_to_file(word, 'sound/test.wav')
-        tts.runAndWait()
-        current_word_lenght = pygame.mixer.Sound("sound/test.wav").get_length()
-        audio_list.append(current_word_lenght)
-        print(f"Word: {word} / lenght {current_word_lenght}\n")
-    print(len(audio_list))
-    print(len(lines))
-    print("a soma dos audios é de:",sum(audio_list))
 
-def get_words_lenght_two(value):
-    global audio_list
-
-    half = int(len(lines)/2)
-    if value == 1:
-        current_text_list = lines[:half]     
-    else:
-        current_text_list = lines[half:]   
-
-    count = 0
-    for word in current_text_list:
-        tts.save_to_file(word, 'sound/test.wav')
-        tts.runAndWait()
-        current_word_lenght = pygame.mixer.Sound("sound/test.wav").get_length()
-        audio_list.append(current_word_lenght)
-        print(count)
-        print(f"Value{value} / Word: {word} / lenght {current_word_lenght}\n")
-        count+=1
-    print(len(audio_list))
-    print(len(lines))
-    print("a soma dos audios é de:",sum(audio_list))
-
-
-def get_words_lenght_four(value):
-    global audio_list
-
-    half = int(len(lines)/2)
-    half_half = int(len(lines)/4)
-
-    if value == 1:
-        current_text_list = lines[:half_half]     
-    elif value == 2:
-        current_text_list = lines[half_half:half]
-    elif value == 3:
-        current_text_list = lines[half:half+half_half]
-    else:  
-        current_text_list = lines[half+half_half:] 
-
-    count = 0
-    for word in current_text_list:
-        tts.save_to_file(word, 'sound/test.wav')
-        tts.runAndWait()
-        current_word_lenght = pygame.mixer.Sound("sound/test.wav").get_length()
-        audio_list.append(current_word_lenght)
-        print(count)
-        print(f"Value{value} / Word: {word} / lenght {current_word_lenght}\n")
-        count+=1
-    print(len(audio_list))
-    print(len(lines))
-    print("a soma dos audios é de:",sum(audio_list))
-
-if len(lines) < 80:
-    threading.Thread(target=get_words_lenght_one, daemon=True).start()
-elif len(lines) < 160:
-    threading.Thread(target=get_words_lenght_two, args=(1,), daemon=True).start()
-    threading.Thread(target=get_words_lenght_two, args=(2,), daemon=True).start()
-else:
-    threading.Thread(target=get_words_lenght_four, args=(1,), daemon=True).start()
-    threading.Thread(target=get_words_lenght_four, args=(2,), daemon=True).start()
-    threading.Thread(target=get_words_lenght_four, args=(3,), daemon=True).start()
-    threading.Thread(target=get_words_lenght_four, args=(4,), daemon=True).start()
-
-
-
-
-# TODO: apagar dps?
+# TODO: apagar dps
 text_content = " ".join(lines)
 print(text_content)
-
-
-#### TODO: slider volume?
 
 # Criar um slider para a posição do áudio
 audio_lenght = pygame.mixer.Sound("sound/current.wav").get_length()
 print(audio_lenght)
+
 
 #como já tem thread ativa, irá dar conflitor se add o command=position_updater
 audio_slider = tk.Scale(root, from_=0, to=audio_lenght, orient='horizontal',length=500, sliderlength=20, showvalue=0) 
