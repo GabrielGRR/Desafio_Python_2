@@ -129,34 +129,29 @@ def next_sound():
         print("next sound failed")
 
 
-## Botões
+## texto
 lines = text.split() 
-palavras_linha = 10  # Quantidade de palavras por linha
-count = 0  # Contador para limitar a criação de frames
-max_words_per_frame = 15  # Quantidade de palavras por frame
+palavras_linha = 13  # Quantidade de palavras por linha
 
-# Variável para armazenar o frame atual
-text_frame = None
+# Variável para armazenar o texto completo
+full_text = ""
 
-for index, line in enumerate(lines):
-    if count == 0:  # Quando o count for 0, cria um novo frame
-        text_frame = tk.Frame(root)
-        text_frame.pack(side=tk.TOP, pady=0)  # Cria um novo frame e empilha
+total_count = 0
+word_counter = 0
+for word in lines:
+    word_counter+=1
+    if word_counter == palavras_linha:
+        lines.insert(total_count,"\n")
+        word_counter=0
+    total_count+=1
 
-    # Cria um botão com o texto
-    text_container = tk.Button(text_frame, text=line, bd=0, highlightthickness=0, pady=0, width=len(line))
-    text_container.pack(side=tk.LEFT, padx=0, pady=0)  # Adiciona o botão ao frame atual
-
-    count += 1
-
-    # Quando atinge o limite de palavras por frame, reinicia o contador
-    if count == max_words_per_frame:
-        count = 0  # Reseta o contador para criar um novo frame no próximo loop
-
-
-# TODO: apagar dps
 text_content = " ".join(lines)
 print(text_content)
+
+# Cria um Label com o texto completo
+text_label = tk.Label(root, text=text_content, font=("Arial",10), relief="sunken") ####mudar fonte?
+text_label.pack(side=tk.TOP, padx=10, pady=10)  # Adiciona o Label à janela principal
+
 
 # Criar um slider para a posição do áudio
 audio_lenght = pygame.mixer.Sound("sound/current.wav").get_length()
