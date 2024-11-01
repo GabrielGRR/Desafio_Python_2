@@ -2,11 +2,20 @@ https://chatgpt.com/c/670543cb-ad54-8013-b819-7ea106acf4ff
 
 ############################################################################## MVP: ##############################################################################
 
-remover botões do texto, colocar o text raw
-
 Selecionar página
 - [input caixa] / total de páginas
 - time.sleep(1)
+
+prev_page
+
+next_page
+
+Selecionar PDF
+
+
+Transformar em classe?
+
+############################################################################## Se der tempo: ##############################################################################
 
 prev_page
 - se next estiver carregado, substituir next pelo current
@@ -15,11 +24,6 @@ next_page:
 - buffer 80%
 - threading
 - free memory do som anterior e deletar arquivo .wav
-
-Selecionar PDF
-
-
-############################################################################## Se der tempo: ##############################################################################
 
 adicionar botão toggle de auto skip next
 
