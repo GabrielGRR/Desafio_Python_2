@@ -49,6 +49,8 @@ root.title("mPD player | PD_f player")
 root.geometry("") # fit to content
 root.minsize(400,400)
 
+root.iconbitmap(default='OrangePD_icon2.ico')
+
 sound_current = 'sound/current.wav'
 
 # Inicializando o pygame
