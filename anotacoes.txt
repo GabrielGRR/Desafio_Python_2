@@ -6,6 +6,7 @@ Selecionar PDF
 
 transformar em .EXE
 
+conferir se não tem nenhum memory leak!!
 
 Transformar em classe?
 
