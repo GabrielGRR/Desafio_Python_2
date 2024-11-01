@@ -2,8 +2,14 @@ https://chatgpt.com/c/670543cb-ad54-8013-b819-7ea106acf4ff
 
 ############################################################################## MVP: ##############################################################################
 
+criar um venv
+
+olhar quais bibliotecas precisa instalar
+atualizar arquivo requirements.txt
+
 transformar em .EXE
 
+olhar configuração de thread, de quando encerrar o código, deletar o áudio current.wav
 conferir se não tem nenhum memory leak!!
 
 Transformar em classe?
