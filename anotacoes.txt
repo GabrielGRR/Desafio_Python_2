@@ -6,10 +6,6 @@ Selecionar página
 - [input caixa] / total de páginas
 - time.sleep(1)
 
-prev_page
-
-next_page
-
 Selecionar PDF
 
 
