@@ -2,6 +2,7 @@ from pypdf import PdfReader
 import pyttsx3
 # from gtts import gTTS
 import tkinter as tk
+from tkinter import filedialog
 import pygame
 import os
 import time
@@ -9,13 +10,21 @@ import threading
 
 palavras_linha = 13
 
+filename = ""
+
 ## Conversão PDF
 def pdf_conversion(num_page: int):
     ## Transformar PDF em TXT
-    reader = PdfReader("O Programador Pragmatico.pdf") # Caminho relativo
-    number_of_pages = len(reader.pages) # não obrigatório
-    page = reader.pages[num_page] # seleciona a página que você quer que seja transcrito
-    text = page.extract_text()
+    global filename, number_of_pages
+    try:
+        reader = PdfReader(filename)
+        number_of_pages = len(reader.pages) # não obrigatório
+        page = reader.pages[num_page] # seleciona a página que você quer que seja transcrito
+        text = page.extract_text()
+    except:
+        text = "Selecione um arquivo PDF"
+        number_of_pages = 1
+        print("deu ruim")
 
     ## Text to Speech (TTS)
     tts = pyttsx3.init()
@@ -38,10 +47,9 @@ root.title("mPD player | PD_f player")
 
 # Definindo o tamanho inicial da janela
 root.geometry("") # fit to content
+root.minsize(400,400)
 
-# sound_prev = 'sound/prev.wav'
 sound_current = 'sound/current.wav'
-# sound_next = 'sound/next.wav'
 
 # Inicializando o pygame
 pygame.mixer.init()
@@ -135,13 +143,14 @@ def prev_sound():
             btn_play_pause.config(text="Pause")
             page_input.delete("1.0","2.0")
             page_input.insert("1.0",f"{current_page}")
+            audio_slider.configure(to=audio_lenght())
         else:
             print("current page is already 1")
     except:
         print("prev sound failed")
 
 def next_sound():
-    global current_page
+    global current_page, number_of_pages
     try:
         if current_page != number_of_pages:
             current_page+=1
@@ -154,6 +163,7 @@ def next_sound():
             btn_play_pause.config(text="Pause")
             page_input.delete("1.0","2.0")
             page_input.insert("1.0",f"{current_page}")
+            audio_slider.configure(to=audio_lenght())
         else:
             print("current page is already last")
     except:
@@ -191,6 +201,7 @@ def process_input(event=None):
             btn_play_pause.config(text="Pause")
             page_input.delete("1.0","2.0")
             page_input.insert("1.0",f"{current_page}")
+            audio_slider.configure(to=audio_lenght())
 
         else:
             print("Invalid page number")
@@ -203,18 +214,21 @@ text_content = ""
 
 # Cria um Label com o texto completo
 text_label = tk.Label(root, text=text_content, font=("Arial",10), relief="sunken") ####mudar fonte?
-text_label.pack(side=tk.TOP, padx=10, pady=10)  # Adiciona o Label à janela principal
+text_label.pack(side=tk.TOP, padx=10, pady=10,expand=True,fill="both")  # Adiciona o Label à janela principal
 
 update_text_label(page_text)
 
 
 # Criar um slider para a posição do áudio
-audio_lenght = pygame.mixer.Sound("sound/current.wav").get_length()
-print(audio_lenght)
+def audio_lenght():
+
+    audio_file_lenght = pygame.mixer.Sound(sound_current).get_length()
+    print(audio_file_lenght)
+    return audio_file_lenght
 
 
 #como já tem thread ativa, irá dar conflitor se add o command=position_updater
-audio_slider = tk.Scale(root, from_=0, to=audio_lenght, orient='horizontal',length=500, sliderlength=20, showvalue=0) 
+audio_slider = tk.Scale(root, from_=0, to=audio_lenght(), orient='horizontal',length=500, sliderlength=20, showvalue=0) 
 audio_slider.pack(pady=5)
 
 # Vincular os eventos de clique e soltura no slider
@@ -236,10 +250,7 @@ page_label.pack(side=tk.LEFT, anchor="w")
 
 # Frame para alinhar os botões na mesma linha
 button_frame = tk.Frame(lower_frame)
-button_frame.pack(side=tk.LEFT, anchor="center", expand=True,padx=(0,70))
-
-
-
+button_frame.pack(side=tk.LEFT, anchor="center", expand=True)
 
 
 btn_prev = tk.Button(button_frame, text="Prev", command=prev_sound)
@@ -251,6 +262,30 @@ btn_play_pause.pack(side=tk.LEFT, padx=3)
 
 btn_next = tk.Button(button_frame, text="Next", command=next_sound)
 btn_next.pack(side=tk.LEFT, padx=3)
+
+
+def browse_file():
+    global filename
+    filename = filedialog.askopenfilename(initialdir = "/",title = "Select a File",filetypes = (("PDF files","*.pdf*"),("all files","*.*")))
+    print(filename)
+    
+    if filename != "":
+        current_page=1
+        pygame.mixer.music.unload()
+        new_text, number_of_pages = pdf_conversion(current_page)
+        pygame.mixer.music.load(sound_current)
+        update_text_label(new_text)
+        audio_slider.set(0)
+        pygame.mixer.music.play(loops=0, start=0)
+        btn_play_pause.config(text="Pause")
+        page_input.delete("1.0","2.0")
+        page_input.insert("1.0",f"{current_page}")
+        page_label.config(text=f"/{number_of_pages}")
+        audio_slider.configure(to=audio_lenght())
+
+
+select_file = tk.Button(lower_frame, text="Select PDF",command=browse_file)
+select_file.pack(side=tk.BOTTOM,anchor="e", padx=10)
 
 
 # Executando a janela
