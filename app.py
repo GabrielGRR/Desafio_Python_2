@@ -27,7 +27,7 @@ def pdf_conversion(num_page: int):
     # tts.save('audio2.wav')
     return text, number_of_pages
 
-current_page = 6
+current_page = 1
 
 page_text, number_of_pages = pdf_conversion(current_page)
 
@@ -133,6 +133,8 @@ def prev_sound():
             audio_slider.set(0)
             pygame.mixer.music.play(loops=0, start=0)
             btn_play_pause.config(text="Pause")
+            page_input.delete("1.0","2.0")
+            page_input.insert("1.0",f"{current_page}")
         else:
             print("current page is already 1")
     except:
@@ -150,6 +152,8 @@ def next_sound():
             audio_slider.set(0)
             pygame.mixer.music.play(loops=0, start=0)
             btn_play_pause.config(text="Pause")
+            page_input.delete("1.0","2.0")
+            page_input.insert("1.0",f"{current_page}")
         else:
             print("current page is already last")
     except:
@@ -172,6 +176,27 @@ def update_text_label(new_text: list):
     text_content = " ".join(lines)
     text_label.config(text=text_content)
 
+def process_input(event=None):
+    global current_page
+    try:
+        new_page = int(page_input.get("1.0", "end-1c"))
+        if 1 <= new_page <= number_of_pages:
+            current_page = new_page
+            pygame.mixer.music.unload()
+            new_text, _ = pdf_conversion(current_page)
+            pygame.mixer.music.load(sound_current)
+            update_text_label(new_text)
+            audio_slider.set(0)
+            pygame.mixer.music.play(loops=0, start=0)
+            btn_play_pause.config(text="Pause")
+            page_input.delete("1.0","2.0")
+            page_input.insert("1.0",f"{current_page}")
+
+        else:
+            print("Invalid page number")
+    except ValueError:
+        print("Invalid input")
+
 ## texto
 
 text_content = ""
@@ -190,16 +215,32 @@ print(audio_lenght)
 
 #como já tem thread ativa, irá dar conflitor se add o command=position_updater
 audio_slider = tk.Scale(root, from_=0, to=audio_lenght, orient='horizontal',length=500, sliderlength=20, showvalue=0) 
-audio_slider.pack(pady=10)
+audio_slider.pack(pady=5)
 
 # Vincular os eventos de clique e soltura no slider
 audio_slider.bind("<ButtonPress-1>", slider_click)  # Quando o slider é clicado
 audio_slider.bind("<ButtonRelease-1>", slider_release)  # Quando o slider é solto
 
+lower_frame = tk.Frame(root)
+lower_frame.pack(side=tk.LEFT, expand=True, fill="x",pady=(0,10))
+
+page_input = tk.Text(lower_frame, height=1, width=4)
+page_input.pack(side=tk.LEFT, anchor="w", padx=(10,0))
+page_input.bind("<Return>", process_input)
+
+page_input.delete("1.0","2.0")
+page_input.insert("1.0",f"{current_page}")
+
+page_label = tk.Label(lower_frame, text=f"/{number_of_pages}", font=("Arial",10)) ####mudar fonte?
+page_label.pack(side=tk.LEFT, anchor="w")
 
 # Frame para alinhar os botões na mesma linha
-button_frame = tk.Frame(root)
-button_frame.pack(side=tk.BOTTOM)
+button_frame = tk.Frame(lower_frame)
+button_frame.pack(side=tk.LEFT, anchor="center", expand=True,padx=(0,70))
+
+
+
+
 
 btn_prev = tk.Button(button_frame, text="Prev", command=prev_sound)
 btn_prev.pack(side=tk.LEFT, padx=3)
@@ -210,6 +251,7 @@ btn_play_pause.pack(side=tk.LEFT, padx=3)
 
 btn_next = tk.Button(button_frame, text="Next", command=next_sound)
 btn_next.pack(side=tk.LEFT, padx=3)
+
 
 # Executando a janela
 root.mainloop()

@@ -2,11 +2,9 @@ https://chatgpt.com/c/670543cb-ad54-8013-b819-7ea106acf4ff
 
 ############################################################################## MVP: ##############################################################################
 
-Selecionar página
-- [input caixa] / total de páginas
-- time.sleep(1)
-
 Selecionar PDF
+
+transformar em .EXE
 
 
 Transformar em classe?
