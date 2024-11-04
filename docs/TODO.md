@@ -1,7 +1,7 @@
 # TODO
 
 - [ ] Refatorar arquivo app.py
-  - [ ] Renomear arquivo para main.py
+  - [X] Renomear arquivo para main.py
   - [ ] Não devem existir definições de variaveis no escopo global do arquivo, NUNCA!
   - [ ] Nunca utilizar o primeiro nível de um arquivo para executar codigo diretamente, passar pela validacao __name__ == __main__
     - [ ] Como vimos, a nivel do arquivo aquilo que nao for definição de função será executado quando o arquivo for executado ou importado.
@@ -16,3 +16,6 @@
 - [X] Estruturção confusa de pastas e arquivos.
   - [X] Criar pasta para docs.
   - [X] Expandir README com documentação básica de projeto
+
+
+def new_page_conversion(current_page, sound_current):
