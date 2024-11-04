@@ -2,6 +2,8 @@ https://chatgpt.com/c/670543cb-ad54-8013-b819-7ea106acf4ff
 
 ############################################################################## MVP: ##############################################################################
 
+ver se o player está com voz em ptbr ou se deixa em en
+
 criar um venv
 
 olhar quais bibliotecas precisa instalar
