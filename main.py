@@ -20,7 +20,7 @@ class PDFPlayer:
         self.root.title("mPD player | PD_f player")
         self.root.geometry("")  # fit to content
         self.root.minsize(400, 400)
-        self.root.maxsize(700,700)
+        self.root.maxsize(700, 700)
         self.root.iconbitmap(default='docs/images/OrangePD_icon2.ico')
 
         self.sound_current = 'results/sound/current.wav'
@@ -30,15 +30,22 @@ class PDFPlayer:
 
         self.page_text, self.number_of_pages = self.pdf_conversion(self.current_page, self.filename)
 
-        # Crie um Frame para encapsular o Label
+        # Crie um Frame para encapsular o Text
         self.text_frame = tk.Frame(self.root, width=600, height=400)
         self.text_frame.pack_propagate(False)  # Impede que o Frame redimensione para caber no conteúdo
         self.text_frame.pack(side=tk.TOP, padx=10, pady=10, expand=True, fill="both")
 
-        # Crie o Label dentro do Frame
-        self.text_label = tk.Label(self.text_frame, text="", font=("Arial", 10), relief="sunken")
+        # Crie o Text dentro do Frame com barras de rolagem
+        self.text_scrollbar = tk.Scrollbar(self.text_frame)
+        self.text_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+        self.text_label = tk.Text(self.text_frame, font=("Arial", 10), relief="sunken", wrap=tk.WORD, yscrollcommand=self.text_scrollbar.set)
         self.text_label.pack(expand=True, fill="both")
 
+        self.text_scrollbar.config(command=self.text_label.yview)
+
+        # Adicione uma tag para centralizar o texto
+        self.text_label.tag_configure("center", justify='center')
 
         self.update_text_label(self.page_text, self.palavras_linha)
 
@@ -50,11 +57,10 @@ class PDFPlayer:
         lower_frame = tk.Frame(self.root)
         lower_frame.pack(side=tk.LEFT, expand=True, fill="x", pady=(0, 10))
 
-        self.page_input = tk.Text(lower_frame, height=1, width=4)
+        self.page_input = tk.Entry(lower_frame, width=4)
         self.page_input.pack(side=tk.LEFT, anchor="w", padx=(10, 0))
         self.page_input.bind("<Return>", self.process_input)
-        self.page_input.delete("1.0", "2.0")
-        self.page_input.insert("1.0", f"{self.current_page}")
+        self.page_input.insert(0, f"{self.current_page}")
 
         self.page_label = tk.Label(lower_frame, text=f"/{self.number_of_pages}", font=("Arial", 10))
         self.page_label.pack(side=tk.LEFT, anchor="w")
@@ -178,10 +184,14 @@ class PDFPlayer:
             total_count += 1
 
         text_content = " ".join(lines)
-        self.text_label.config(text=text_content)
+        self.text_label.config(state=tk.NORMAL)
+        self.text_label.delete("1.0", tk.END)
+        self.text_label.insert(tk.END, text_content)
+        self.text_label.tag_add("center", "1.0", "end")
+        self.text_label.config(state=tk.DISABLED)
 
     def process_input(self, event=None):
-        new_page = int(self.page_input.get("1.0", "end-1c"))
+        new_page = int(self.page_input.get())
         if 1 <= new_page <= self.number_of_pages:
             self.new_page_conversion(new_page, 'results/sound/current.wav', self.filename)
             self.current_page = new_page
@@ -196,8 +206,8 @@ class PDFPlayer:
         self.audio_slider.set(0)
         pygame.mixer.music.play(loops=0, start=0)
         self.btn_play_pause.config(text="Pause")
-        self.page_input.delete("1.0", "2.0")
-        self.page_input.insert("1.0", f"{current_page}")
+        self.page_input.delete(0, tk.END)
+        self.page_input.insert(0, f"{current_page}")
         self.audio_slider.configure(to=self.audio_lenght())
 
     def audio_lenght(self):
