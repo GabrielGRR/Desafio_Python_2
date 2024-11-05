@@ -86,7 +86,7 @@ class PDFPlayer:
         try:
             reader = PdfReader(filename)
             self.number_of_pages = len(reader.pages)
-            page = reader.pages[num_page]
+            page = reader.pages[num_page-1]
             text = page.extract_text()
         except:
             text = "Selecione um arquivo PDF"
