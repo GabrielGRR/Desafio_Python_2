@@ -5,3 +5,5 @@ python -m venv venv
 venv/Scripts/activate
 
 pip install -r docs/requirements.txt
+
+python main.py
