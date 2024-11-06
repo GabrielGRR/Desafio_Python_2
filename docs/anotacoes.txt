@@ -2,21 +2,12 @@ https://chatgpt.com/c/670543cb-ad54-8013-b819-7ea106acf4ff
 
 ############################################################################## MVP: ##############################################################################
 
-conferir page_input
-
 ver se o player está com voz em ptbr ou se deixa em en
-
-criar um venv
-
-olhar quais bibliotecas precisa instalar
-atualizar arquivo requirements.txt
 
 transformar em .EXE
 
 olhar configuração de thread, de quando encerrar o código, deletar o áudio current.wav
 conferir se não tem nenhum memory leak!!
-
-Transformar em classe?
 
 desafio do desafio: integrar chat gpt para resumir a pagina
 
