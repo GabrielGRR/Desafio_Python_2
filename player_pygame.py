@@ -7,6 +7,7 @@ class PDFPlayer:
     def __init__(self):
         self.sound_current = 'results/sound/current.wav'
         pygame.mixer.init()
+        pygame.mixer.music.load(os.path.join("results/sound", "pdf.wav"))
 
     def pdf_conversion(self, num_page: int, filename: str):
         try:

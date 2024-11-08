@@ -9,6 +9,7 @@ class PDFPlayerGUI:
         self.current_page = 1
         self.number_of_pages = 1
         self.is_dragging_slider = False
+        self.music_loaded = False
 
         self.root = root
         self.root.title("mPD player | PD_f player")
@@ -16,6 +17,7 @@ class PDFPlayerGUI:
         self.root.minsize(400, 400)
         self.root.maxsize(700, 700)
         self.root.iconbitmap(default='docs/images/OrangePD_icon2.ico')
+        
 
         self.page_text, self.number_of_pages = self.player.pdf_conversion(self.current_page, self.filename)
 
@@ -143,17 +145,24 @@ class PDFPlayerGUI:
 
     def play_pause(self):
         try:
+            print('estou aqui!')
             if not self.music_loaded:
+                print('estou aqui 1')
                 self.player.play_music(start=0)
                 self.btn_play_pause.config(text="Pause")
                 self.music_loaded = True
+
             elif not self.player.is_playing():
+                print('estou aqui 2')
                 self.audio_slider.set(self.paused_pos())
                 self.player.unpause_music()
                 self.btn_play_pause.config(text="Pause")
+                
             else:
+                print('estou aqui 3')
                 self.player.pause_music()
                 self.btn_play_pause.config(text="Play")
+                print('estou aqui')
         except Exception as e:
             print(f"play music failed: {e}")
 
