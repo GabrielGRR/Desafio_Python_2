@@ -2,6 +2,10 @@ https://chatgpt.com/c/670543cb-ad54-8013-b819-7ea106acf4ff
 
 ############################################################################## MVP: ##############################################################################
 
+https://refactoring.guru/design-patterns/singleton
+
+https://docs.python.org/3/library/abc.html
+
 ver se o player está com voz em ptbr ou se deixa em en
 
 transformar em .EXE
