@@ -18,6 +18,9 @@ desafio do desafio: integrar chat gpt para resumir a pagina
 ############################################################################## Se der tempo: ##############################################################################
 
 #############
+
+@property decorator
+
 "Typically Python comes with pip, a package installer. Using it you can install pypdf:
 
 pip install pypdf
