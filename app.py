@@ -23,8 +23,11 @@ class PDFPlayer:
         self._InitMixer()
         self._InitGUI()
 
+        # estudar paralelismo e concorrencia
         threading.Thread(target=self.position_updater, daemon=True).start()
 
+
+    # private methods
     def _InitMixer(self):
         pygame.mixer.init()
         pygame.mixer.music.load(os.path.join("results/sound", "pdf.wav"))
