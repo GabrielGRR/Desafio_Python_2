@@ -16,7 +16,18 @@ class PDFPlayer:
         self.is_dragging_slider = False
         self.music_loaded = False
 
+        self._InitMixer()
+        
         self.root = root
+        self._InitGUI()
+
+        threading.Thread(target=self.position_updater, daemon=True).start()
+
+    def _InitMixer(self):
+        pygame.mixer.init()
+        pygame.mixer.music.load(os.path.join("results/sound", "pdf.wav"))
+
+    def _InitGUI(self):
         self.root.title("mPD player | PD_f player")
         self.root.geometry("")  # fit to content
         self.root.minsize(400, 400)
@@ -25,8 +36,7 @@ class PDFPlayer:
 
         self.sound_current = 'results/sound/current.wav'
 
-        pygame.mixer.init()
-        pygame.mixer.music.load(os.path.join("results/sound", "pdf.wav"))
+        
 
         self.page_text, self.number_of_pages = self.pdf_conversion(self.current_page, self.filename)
 
@@ -79,8 +89,6 @@ class PDFPlayer:
 
         select_file = tk.Button(lower_frame, text="Select PDF", command=self.browse_file)
         select_file.pack(side=tk.BOTTOM, anchor="e", padx=10)
-
-        threading.Thread(target=self.position_updater, daemon=True).start()
 
     def pdf_conversion(self, num_page: int, filename: str):
         try:
