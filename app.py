@@ -15,10 +15,12 @@ class PDFPlayer:
         self.number_of_pages = 1
         self.is_dragging_slider = False
         self.music_loaded = False
+        self.sound_current = 'results/sound/current.wav'                
+        self.page_text, self.number_of_pages = self.pdf_conversion(self.current_page, self.filename)
+
+        self.root = root
 
         self._InitMixer()
-        
-        self.root = root
         self._InitGUI()
 
         threading.Thread(target=self.position_updater, daemon=True).start()
@@ -32,13 +34,7 @@ class PDFPlayer:
         self.root.geometry("")  # fit to content
         self.root.minsize(400, 400)
         self.root.maxsize(700, 700)
-        self.root.iconbitmap(default='docs/images/OrangePD_icon2.ico')
-
-        self.sound_current = 'results/sound/current.wav'
-
-        
-
-        self.page_text, self.number_of_pages = self.pdf_conversion(self.current_page, self.filename)
+        self.root.iconbitmap(default='docs/images/OrangePD_icon2.ico')        
 
         # Crie um Frame para encapsular o Text
         self.text_frame = tk.Frame(self.root, width=600, height=400)
@@ -59,7 +55,7 @@ class PDFPlayer:
 
         self.update_text_label(self.page_text, self.palavras_linha)
 
-        self.audio_slider = tk.Scale(self.root, from_=0, to=self.audio_lenght(), orient='horizontal', length=500, sliderlength=20, showvalue=0)
+        self.audio_slider = tk.Scale(self.root, from_=0, to=self.get_audio_lenght(), orient='horizontal', length=500, sliderlength=20, showvalue=0)
         self.audio_slider.pack(pady=5)
         self.audio_slider.bind("<ButtonPress-1>", self.slider_click)
         self.audio_slider.bind("<ButtonRelease-1>", self.slider_release)
@@ -90,6 +86,26 @@ class PDFPlayer:
         select_file = tk.Button(lower_frame, text="Select PDF", command=self.browse_file)
         select_file.pack(side=tk.BOTTOM, anchor="e", padx=10)
 
+    # Métodos 'getter'
+    def get_is_playing(self):
+        return pygame.mixer.music.get_busy()
+
+    def get_paused_pos(self):
+        current_pos = self.audio_slider.get()
+        return current_pos
+
+    def get_audio_lenght(self):
+        audio_file_lenght = pygame.mixer.Sound(self.sound_current).get_length()
+        return audio_file_lenght
+    
+    def thread_check(self):
+        threads_ativas = threading.enumerate()
+        print(f"Total de threads ativas: {len(threads_ativas)}")
+        print("Lista de threads:")
+        for thread in threads_ativas:
+            print(f"- {thread.name} (daemon: {thread.daemon})")
+
+    # Métodos 'Setter'
     def pdf_conversion(self, num_page: int, filename: str):
         try:
             reader = PdfReader(filename)
@@ -102,20 +118,15 @@ class PDFPlayer:
         tts = pyttsx3.init()
         tts.save_to_file(text, 'results/sound/current.wav')
         tts.runAndWait()
-        print(text)
         return text, self.number_of_pages
-
-    def paused_pos(self):
-        current_pos = self.audio_slider.get()
-        return current_pos
 
     def position_updater(self, val=None):
         while True:
             time.sleep(1)
-            if self.is_playing() and not self.is_dragging_slider:
+            if self.get_is_playing() and not self.is_dragging_slider:
                 pos = self.audio_slider.get() + 1
                 self.audio_slider.set(pos)
-                self.checar_threads()
+                self.thread_check()
 
     def slider_click(self, event=None):
         self.is_dragging_slider = True
@@ -123,12 +134,9 @@ class PDFPlayer:
 
     def slider_release(self, event=None):
         if self.is_dragging_slider:
-            pygame.mixer.music.play(loops=0, start=self.paused_pos())
-            pygame.mixer.music.set_pos(self.paused_pos())
+            pygame.mixer.music.play(loops=0, start=self.get_paused_pos())
+            pygame.mixer.music.set_pos(self.get_paused_pos())
             self.is_dragging_slider = False
-
-    def is_playing(self):
-        return pygame.mixer.music.get_busy()
 
     def play_pause(self):
         try:
@@ -136,28 +144,18 @@ class PDFPlayer:
                 pygame.mixer.music.play(loops=0, start=0)
                 self.btn_play_pause.config(text="Pause")
                 self.music_loaded = True
-                print('esteve aqui 1')
 
-            elif not self.is_playing():
-                self.audio_slider.set(self.paused_pos())
+            elif not self.get_is_playing():
+                self.audio_slider.set(self.get_paused_pos())
                 pygame.mixer.music.unpause()
                 self.btn_play_pause.config(text="Pause")
-                print('esteve aqui 2')
 
             else:
                 pygame.mixer.music.pause()
                 self.btn_play_pause.config(text="Play")
-                print('esteve aqui 3')
 
         except Exception as e:
             print(f"play music failed: {e}")
-
-    def checar_threads(self):
-        threads_ativas = threading.enumerate()
-        print(f"Total de threads ativas: {len(threads_ativas)}")
-        print("Lista de threads:")
-        for thread in threads_ativas:
-            print(f"- {thread.name} (daemon: {thread.daemon})")
 
     def prev_sound(self):
         try:
@@ -216,12 +214,7 @@ class PDFPlayer:
         self.btn_play_pause.config(text="Pause")
         self.page_input.delete(0, tk.END)
         self.page_input.insert(0, f"{current_page}")
-        self.audio_slider.configure(to=self.audio_lenght())
-
-    def audio_lenght(self):
-        audio_file_lenght = pygame.mixer.Sound(self.sound_current).get_length()
-        print(audio_file_lenght)
-        return audio_file_lenght
+        self.audio_slider.configure(to=self.get_audio_lenght())
 
     def browse_file(self):
         filename = filedialog.askopenfilename(initialdir="/", title="Select a File", filetypes=(("PDF files", "*.pdf*"), ("all files", "*.*")))
