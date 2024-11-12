@@ -8,6 +8,15 @@ import time
 import threading
 
 class PDFPlayer:
+    """
+    Uma classe para criar um audio player de PDF usando Tkinter.
+
+    Uso esperado:
+        root = tk.Tk()
+        app = PDFPlayer(root)
+        root.mainloop()
+    """    
+
     def __init__(self, root: object):
         self.max_palavras_linha = 13
         self.filename = ""
@@ -25,7 +34,6 @@ class PDFPlayer:
 
         # estudar paralelismo e concorrencia
         threading.Thread(target=self.position_updater, daemon=True).start()
-
 
     # private methods
     def _InitMixer(self):
@@ -107,17 +115,16 @@ class PDFPlayer:
         select_file = tk.Button(lower_frame, text="Select PDF", command=self.browse_file)
         select_file.pack(side=tk.BOTTOM, anchor="e", padx=10)
 
+
     # Métodos 'getter'
     def get_is_playing(self):
         return pygame.mixer.music.get_busy()
 
     def get_paused_pos(self):
-        current_pos = self.audio_slider.get()
-        return current_pos
+        return self.audio_slider.get()
 
     def get_audio_lenght(self):
-        audio_file_lenght = pygame.mixer.Sound(self.sound_current).get_length()
-        return audio_file_lenght
+        return pygame.mixer.Sound(self.sound_current).get_length()
     
     def thread_check(self):
         """Checa se as threads foram corretamente inicializados."""
@@ -127,6 +134,7 @@ class PDFPlayer:
         print("Lista de threads:")
         for thread in threads_ativas:
             print(f"- {thread.name} (daemon: {thread.daemon})")
+
 
     # Métodos 'Setter'
     def pdf_conversion(self, num_page: int, filename: str):
@@ -235,10 +243,9 @@ class PDFPlayer:
             new_text (list): O novo texto a ser exibido no rótulo de texto.
         """
         
-        lines = new_text.split()
-
         total_count = 0
         word_counter = 0
+        lines = new_text.split()
         for _ in lines:
             word_counter += 1
             if word_counter == self.max_palavras_linha:
@@ -256,12 +263,15 @@ class PDFPlayer:
     def page_user_input(self, event=None):
         """Atualiza a pagina atual para a que o usuário digitou."""
 
-        new_page = int(self.page_input.get())
-        if 1 <= new_page <= self.number_of_pages:
-            self.new_page_conversion(new_page, 'results/sound/current.wav', self.filename)
-            self.current_page = new_page
-        else:
-            print("Invalid page number")
+        try:
+            new_page = int(self.page_input.get())
+            if 1 <= new_page <= self.number_of_pages:
+                self.new_page_conversion(new_page, 'results/sound/current.wav', self.filename)
+                self.current_page = new_page
+            else:
+                print("Invalid page number")
+        except ValueError:
+            print("Invalid input")
 
     def new_page_conversion(self, current_page: int, sound_current: str, filename: str):
         """
@@ -285,7 +295,7 @@ class PDFPlayer:
 
     def browse_file(self):
         """Opens a file dialog for the user to select a PDF file."""
-        
+
         filename = filedialog.askopenfilename(initialdir="/", title="Select a File", filetypes=(("PDF files", "*.pdf*"), ("all files", "*.*")))
 
         if filename != "":
