@@ -6,6 +6,10 @@ https://refactoring.guru/design-patterns/singleton
 
 https://docs.python.org/3/library/abc.html
 
+https://thomasventurini.com/articles/the-best-way-to-work-with-todos-in-vscode/
+
+pedir para o aluno colocar icones de play e pause no botão
+
 ver se o player está com voz em ptbr ou se deixa em en
 
 transformar em .EXE
