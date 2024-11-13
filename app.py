@@ -77,7 +77,7 @@ class PDFPlayer:
         self.text_label.pack(expand=True, fill="both")
         self.text_scrollbar.config(command=self.text_label.yview)
         self.text_label.tag_configure("center", justify='center')
-        self.update_text_label(self.page_text)
+        self.update_text_label("Select a PDF file.")
 
         # Parâmetros do 'slider' de áudio
         self.audio_slider = tk.Scale(self.root, from_=0, to=self.get_audio_lenght(), orient='horizontal', length=500, sliderlength=20, showvalue=0)
@@ -180,10 +180,12 @@ class PDFPlayer:
                 self.audio_slider.set(pos)
                 self.thread_check()
 
+    # Eventos de mouse ao interagir com o slider
     def slider_click(self, event=None):
         self.is_dragging_slider = True
         pygame.mixer.music.stop()
 
+    # Eventos de mouse ao interagir com o slider
     def slider_release(self, event=None):
         if self.is_dragging_slider:
             pygame.mixer.music.play(loops=0, start=self.get_paused_pos())
