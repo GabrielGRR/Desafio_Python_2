@@ -53,14 +53,7 @@ class PDFPlayer:
         Este método configura a janela principal, frames, áreas de texto, barras de rolagem, sliders,
         e botões usados na aplicação. Também configura as propriedades da janela e widgets necessários.
 
-        Widgets criados:
-        - Janela principal com título, geometria, tamanho mínimo, tamanho máximo e ícone.
-        - Frame para encapsular o widget Text.
-        - Widget Text com barra de rolagem para exibir texto.
-        - Slider de áudio para controlar a reprodução de áudio.
-        - Widget Entry para entrada de página.
-        - Widget Label para exibir o número total de páginas.
-        - Botões para navegar no áudio (Anterior, Reproduzir/Pausar, Próximo) e selecionar um arquivo PDF.
+        Widgets são todo tipo de ferramenta do tkinter.
         """
 
         # Parâmetros da interface gráfica
