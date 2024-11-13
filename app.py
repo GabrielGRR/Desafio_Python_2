@@ -18,6 +18,8 @@ class PDFPlayer:
     """    
 
     def __init__(self, root: object):
+        
+        # Definição dos parâmetros da instância da classe (Equivalente a variáveis globais, mas dentro de uma classe).
         self.max_palavras_linha = 13
         self.filename = ""
         self.current_page = 1
@@ -27,15 +29,17 @@ class PDFPlayer:
         self.sound_current = 'results/sound/current.wav'                
         self.page_text, self.number_of_pages = self.pdf_conversion(self.current_page, self.filename)
 
+        # Por conveção do tkinter, a janela principal é chamada de janela raiz, portanto, root
         self.root = root
 
+        # Inicializadores/construtores do player de áudio e interface gráfica do usuário(GUI) 
         self._InitMixer()
         self._InitGUI()
 
-        # estudar paralelismo e concorrencia
+        # TODO: estudar paralelismo e concorrencia
         threading.Thread(target=self.position_updater, daemon=True).start()
 
-    # private methods
+    # Funções de uso interno
     def _InitMixer(self):
         """Inicializa o mixer pygame e carrega um arquivo de música."""
 
@@ -59,59 +63,66 @@ class PDFPlayer:
         - Botões para navegar no áudio (Anterior, Reproduzir/Pausar, Próximo) e selecionar um arquivo PDF.
         """
 
+        # Parâmetros da interface gráfica
         self.root.title("mPD player | PD_f player")
         self.root.geometry("")  # fit to content
         self.root.minsize(400, 400)
         self.root.maxsize(700, 700)
         self.root.iconbitmap(default='docs/images/OrangePD_icon2.ico')        
 
-        # Crie um Frame para encapsular o Text
+        # Frame para encapsular o Text
         self.text_frame = tk.Frame(self.root, width=600, height=400)
         self.text_frame.pack_propagate(False)  # Impede que o Frame redimensione para caber no conteúdo
         self.text_frame.pack(side=tk.TOP, padx=10, pady=10, expand=True, fill="both")
 
-        # Crie o Text dentro do Frame com barras de rolagem
+        # Barras de rolagem para textos longos
         self.text_scrollbar = tk.Scrollbar(self.text_frame)
         self.text_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
+        # Parâmetros do texto
         self.text_label = tk.Text(self.text_frame, font=("Arial", 10), relief="sunken", wrap=tk.WORD, yscrollcommand=self.text_scrollbar.set)
         self.text_label.pack(expand=True, fill="both")
-
         self.text_scrollbar.config(command=self.text_label.yview)
-
-        # Adicione uma tag para centralizar o texto
         self.text_label.tag_configure("center", justify='center')
-
         self.update_text_label(self.page_text)
 
+        # Parâmetros do 'slider' de áudio
         self.audio_slider = tk.Scale(self.root, from_=0, to=self.get_audio_lenght(), orient='horizontal', length=500, sliderlength=20, showvalue=0)
         self.audio_slider.pack(pady=5)
         self.audio_slider.bind("<ButtonPress-1>", self.slider_click)
         self.audio_slider.bind("<ButtonRelease-1>", self.slider_release)
 
+        # Frame para encapsular input da página
         lower_frame = tk.Frame(self.root)
         lower_frame.pack(side=tk.LEFT, expand=True, fill="x", pady=(0, 10))
 
+        # Caixa de input de página
         self.page_input = tk.Entry(lower_frame, width=4)
         self.page_input.pack(side=tk.LEFT, anchor="w", padx=(10, 0))
         self.page_input.bind("<Return>", self.page_user_input)
         self.page_input.insert(0, f"{self.current_page}")
 
+        # Complemento da caixa de input de pagina, mostrando o total de páginas daquele PDF
         self.page_label = tk.Label(lower_frame, text=f"/{self.number_of_pages}", font=("Arial", 10))
         self.page_label.pack(side=tk.LEFT, anchor="w")
 
+        # Frame para encapsular os botões, está dentro da frame anterior (lower_frame)
         button_frame = tk.Frame(lower_frame)
         button_frame.pack(side=tk.LEFT, anchor="center", expand=True)
 
+        # Botão de voltar página
         btn_prev = tk.Button(button_frame, text="Prev", command=self.prev_sound)
         btn_prev.pack(side=tk.LEFT, padx=3)
 
+        # Botão de toggle de pausar e tocar áudio
         self.btn_play_pause = tk.Button(button_frame, text="Play", command=self.play_pause)
         self.btn_play_pause.pack(side=tk.LEFT, padx=3)
 
+        # Botão de avançar página
         btn_next = tk.Button(button_frame, text="Next", command=self.next_sound)
         btn_next.pack(side=tk.LEFT, padx=3)
 
+        # Botão de selecionar arquivo PDF
         select_file = tk.Button(lower_frame, text="Select PDF", command=self.browse_file)
         select_file.pack(side=tk.BOTTOM, anchor="e", padx=10)
 
@@ -304,7 +315,19 @@ class PDFPlayer:
             self.page_label.config(text=f"/{self.number_of_pages}")
             self.filename = filename
 
+#TODO: Explicar o pq se usa __name__ == __main__
 if __name__ == "__main__":
+    # Criação da janela 'raiz' pela biblioteca tkinter
     root = tk.Tk()
+    
+    # Inicialização do nosso objeto PDFPlayer, onde o argumento da nossa classe, é o objeto criado anteriormente
     app = PDFPlayer(root)
+    
+    # Função nativa do tkinter que permite a GUI ler e executar funções baseadas em nossos inputs
     root.mainloop()
+
+    # /\ equivalente a um while True:
+    # while enquanto_a_janela_existir():
+    #   aguardar_eventos_e_inputs()
+    #   event.executar()
+    #   event = lista_eventos.pop()
