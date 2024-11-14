@@ -1,5 +1,8 @@
 https://chatgpt.com/c/670543cb-ad54-8013-b819-7ea106acf4ff
 
+#documentação do desafio
+https://chatgpt.com/c/6735fd68-0ef0-8013-9b4e-0f0c24798ead
+
 ############################################################################## MVP: ##############################################################################
 
 https://refactoring.guru/design-patterns/singleton
@@ -7,6 +10,7 @@ https://refactoring.guru/design-patterns/singleton
 https://docs.python.org/3/library/abc.html
 
 https://thomasventurini.com/articles/the-best-way-to-work-with-todos-in-vscode/
+
 
 pedir para o aluno colocar icones de play e pause no botão
 
