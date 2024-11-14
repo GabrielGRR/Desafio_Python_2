@@ -1,11 +1,15 @@
-from pypdf import PdfReader
-import pyttsx3
-import tkinter as tk
-from tkinter import filedialog
-import pygame
+# Bibliotecas padrão
 import os
 import time
 import threading
+
+# Bibliotecas Externas
+from pypdf import PdfReader
+import pyttsx3
+import pygame
+import tkinter as tk
+from tkinter import filedialog
+
 
 class PDFPlayer:
     """
@@ -27,7 +31,7 @@ class PDFPlayer:
         self.is_dragging_slider = False
         self.music_loaded = False
         self.sound_current = 'results/sound/current.wav'                
-        self.page_text, self.number_of_pages = self.pdf_conversion(self.current_page, self.filename)
+        self.page_text, self.number_of_pages = self.convert_pdf_to_audio(self.current_page, self.filename)
 
         # Por conveção do tkinter, a janela principal é chamada de janela raiz, portanto, root
         self.root = root
@@ -66,21 +70,35 @@ class PDFPlayer:
         # Frame para encapsular o Text
         self.text_frame = tk.Frame(self.root, width=600, height=400)
         self.text_frame.pack_propagate(False)  # Impede que o Frame redimensione para caber no conteúdo
-        self.text_frame.pack(side=tk.TOP, padx=10, pady=10, expand=True, fill="both")
+        self.text_frame.pack(side=tk.TOP, 
+                             padx=10, 
+                             pady=10, 
+                             expand=True, 
+                             fill="both")
 
         # Barras de rolagem para textos longos
         self.text_scrollbar = tk.Scrollbar(self.text_frame)
         self.text_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
         # Parâmetros do texto
-        self.text_label = tk.Text(self.text_frame, font=("Arial", 10), relief="sunken", wrap=tk.WORD, yscrollcommand=self.text_scrollbar.set)
+        self.text_label = tk.Text(self.text_frame, 
+                                  font=("Arial", 10), 
+                                  relief="sunken", 
+                                  wrap=tk.WORD, 
+                                  yscrollcommand=self.text_scrollbar.set)
         self.text_label.pack(expand=True, fill="both")
         self.text_scrollbar.config(command=self.text_label.yview)
         self.text_label.tag_configure("center", justify='center')
         self.update_text_label("Select a PDF file.")
 
         # Parâmetros do 'slider' de áudio
-        self.audio_slider = tk.Scale(self.root, from_=0, to=self.get_audio_lenght(), orient='horizontal', length=500, sliderlength=20, showvalue=0)
+        self.audio_slider = tk.Scale(self.root, 
+                                     from_=0, 
+                                     to=self.get_audio_length(), 
+                                     orient='horizontal', 
+                                     length=500, 
+                                     sliderlength=20, 
+                                     showvalue=0)
         self.audio_slider.pack(pady=5)
         self.audio_slider.bind("<ButtonPress-1>", self.slider_click)
         self.audio_slider.bind("<ButtonRelease-1>", self.slider_release)
@@ -92,7 +110,7 @@ class PDFPlayer:
         # Caixa de input de página
         self.page_input = tk.Entry(lower_frame, width=4)
         self.page_input.pack(side=tk.LEFT, anchor="w", padx=(10, 0))
-        self.page_input.bind("<Return>", self.page_user_input)
+        self.page_input.bind("<Return>", self.navigate_to_page)
         self.page_input.insert(0, f"{self.current_page}")
 
         # Complemento da caixa de input de pagina, mostrando o total de páginas daquele PDF
@@ -104,16 +122,16 @@ class PDFPlayer:
         button_frame.pack(side=tk.LEFT, anchor="center", expand=True)
 
         # Botão de voltar página
-        btn_prev = tk.Button(button_frame, text="Prev", command=self.prev_sound)
-        btn_prev.pack(side=tk.LEFT, padx=3)
+        button_prev = tk.Button(button_frame, text="Prev", command=self.prev_sound)
+        button_prev.pack(side=tk.LEFT, padx=3)
 
         # Botão de toggle de pausar e tocar áudio
-        self.btn_play_pause = tk.Button(button_frame, text="Play", command=self.play_pause)
-        self.btn_play_pause.pack(side=tk.LEFT, padx=3)
+        self.button_play_pause = tk.Button(button_frame, text="Play", command=self.play_pause)
+        self.button_play_pause.pack(side=tk.LEFT, padx=3)
 
         # Botão de avançar página
-        btn_next = tk.Button(button_frame, text="Next", command=self.next_sound)
-        btn_next.pack(side=tk.LEFT, padx=3)
+        button_next = tk.Button(button_frame, text="Next", command=self.next_sound)
+        button_next.pack(side=tk.LEFT, padx=3)
 
         # Botão de selecionar arquivo PDF
         select_file = tk.Button(lower_frame, text="Select PDF", command=self.browse_file)
@@ -127,7 +145,7 @@ class PDFPlayer:
     def get_paused_pos(self):
         return self.audio_slider.get()
 
-    def get_audio_lenght(self):
+    def get_audio_length(self):
         return pygame.mixer.Sound(self.sound_current).get_length()
     
     def thread_check(self):
@@ -141,7 +159,7 @@ class PDFPlayer:
 
 
     # Métodos 'Setter'
-    def pdf_conversion(self, num_page: int, filename: str):
+    def convert_pdf_to_audio(self, num_page: int, filename: str) -> tuple[str, int]:
         """
         Converte uma página especificada de um arquivo PDF para texto e salva como um arquivo de áudio.
             num_page (int): O número da página a ser convertida.
@@ -202,17 +220,17 @@ class PDFPlayer:
         try:
             if not self.music_loaded:
                 pygame.mixer.music.play(loops=0, start=0)
-                self.btn_play_pause.config(text="Pause")
+                self.button_play_pause.config(text="Pause")
                 self.music_loaded = True
 
             elif not self.get_is_playing():
                 self.audio_slider.set(self.get_paused_pos())
                 pygame.mixer.music.unpause()
-                self.btn_play_pause.config(text="Pause")
+                self.button_play_pause.config(text="Pause")
 
             else:
                 pygame.mixer.music.pause()
-                self.btn_play_pause.config(text="Play")
+                self.button_play_pause.config(text="Play")
 
         except Exception as e:
             print(f"play music failed: {e}")
@@ -266,7 +284,7 @@ class PDFPlayer:
         self.text_label.tag_add("center", "1.0", "end")
         self.text_label.config(state=tk.DISABLED)
 
-    def page_user_input(self, event=None):
+    def navigate_to_page(self, event=None):
         """Atualiza a pagina atual para a que o usuário digitou."""
 
         try:
@@ -289,20 +307,22 @@ class PDFPlayer:
             filename (str): O caminho do arquivo PDF.
         """
         pygame.mixer.music.unload()
-        new_text, _ = self.pdf_conversion(current_page, filename)
+        new_text, _ = self.convert_pdf_to_audio(current_page, filename)
         pygame.mixer.music.load(sound_current)
         self.update_text_label(new_text)
         self.audio_slider.set(0)
         pygame.mixer.music.play(loops=0, start=0)
-        self.btn_play_pause.config(text="Pause")
+        self.button_play_pause.config(text="Pause")
         self.page_input.delete(0, tk.END)
         self.page_input.insert(0, f"{current_page}")
-        self.audio_slider.configure(to=self.get_audio_lenght())
+        self.audio_slider.configure(to=self.get_audio_length())
 
     def browse_file(self):
         """Opens a file dialog for the user to select a PDF file."""
 
-        filename = filedialog.askopenfilename(initialdir="/", title="Select a File", filetypes=(("PDF files", "*.pdf*"), ("all files", "*.*")))
+        filename = filedialog.askopenfilename(initialdir="/", 
+                                              title="Select a File", 
+                                              filetypes=(("PDF files", "*.pdf*"), ("all files", "*.*")))
 
         if filename != "":
             self.current_page = 1
