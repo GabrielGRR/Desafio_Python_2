@@ -80,14 +80,14 @@ class PDFPlayer:
         self.text_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
         # Parâmetros do texto
-        self.text_label = tk.Text(self.text_frame, 
+        self.text_widget = tk.Text(self.text_frame, 
                                   font=("Arial", 10), 
                                   relief="sunken", 
                                   wrap=tk.WORD, 
                                   yscrollcommand=self.text_scrollbar.set)
-        self.text_label.pack(expand=True, fill="both")
-        self.text_scrollbar.config(command=self.text_label.yview)
-        self.text_label.tag_configure("center", justify='center')
+        self.text_widget.pack(expand=True, fill="both")
+        self.text_scrollbar.config(command=self.text_widget.yview)
+        self.text_widget.tag_configure("center", justify='center')
         self.update_text_label("Select a PDF file.")
 
         # Parâmetros do 'slider' de áudio
@@ -277,11 +277,11 @@ class PDFPlayer:
             total_count += 1
 
         text_content = " ".join(lines)
-        self.text_label.config(state=tk.NORMAL)
-        self.text_label.delete("1.0", tk.END)
-        self.text_label.insert(tk.END, text_content)
-        self.text_label.tag_add("center", "1.0", "end")
-        self.text_label.config(state=tk.DISABLED)
+        self.text_widget.config(state=tk.NORMAL)
+        self.text_widget.delete("1.0", tk.END)
+        self.text_widget.insert(tk.END, text_content)
+        self.text_widget.tag_add("center", "1.0", "end")
+        self.text_widget.config(state=tk.DISABLED)
 
     def navigate_to_page(self, event=None):
         """Atualiza a pagina atual para a que o usuário digitou."""
