@@ -30,7 +30,7 @@ class PDFPlayer:
         self.is_dragging_slider = False
         self.music_loaded = False
         self.sound_current = 'results/sound/current.wav'                
-        self.page_text, self.number_of_pages = self.convert_pdf_to_audio(self.current_page, self.filename)
+        self.page_text, self.number_of_pages = self.convert_pdf_to_text(self.current_page, self.filename)
 
         # Por conveção do tkinter, a janela principal é chamada de janela raiz, portanto, root
         self.root = root
@@ -48,6 +48,7 @@ class PDFPlayer:
 
         pygame.mixer.init()
         pygame.mixer.music.load(os.path.join("results/sound", "pdf.wav"))
+        self.convert_text_to_audio(self.page_text)
 
     def _InitGUI(self):
         """
@@ -88,7 +89,7 @@ class PDFPlayer:
         self.text_widget.pack(expand=True, fill="both")
         self.text_scrollbar.config(command=self.text_widget.yview)
         self.text_widget.tag_configure("center", justify='center')
-        self.update_text_label("Select a PDF file.")
+        self.set_screen_text("Select a PDF file.")
 
         # Parâmetros do 'slider' de áudio
         self.audio_slider = tk.Scale(self.root, 
@@ -158,7 +159,7 @@ class PDFPlayer:
 
 
     # Métodos 'Setter'
-    def convert_pdf_to_audio(self, num_page: int, filename: str) -> tuple[str, int]:
+    def convert_pdf_to_text(self, num_page: int, filename: str) -> tuple[str, int]:
         """
         Converte uma página especificada de um arquivo PDF para texto e salva como um arquivo de áudio.
             num_page (int): O número da página a ser convertida.
@@ -182,10 +183,23 @@ class PDFPlayer:
         except:
             text = "Selecione um arquivo PDF"
             self.number_of_pages = 1
+
+        return text, self.number_of_pages
+    
+    def convert_text_to_audio(self, text: str):
+        """
+        Converte um texto em um áudio .wav.
+
+        Args:
+            text (str): O texto a ser convertido em áudio.
+
+        Saves:
+            Salva um arquivo de áudio 'current.wav' via TTS na pasta 'results/sound/'.
+        """
+
         tts = pyttsx3.init()
         tts.save_to_file(text, 'results/sound/current.wav')
         tts.runAndWait()
-        return text, self.number_of_pages
 
     def position_updater(self, val=None):
         """Atualiza continuamente a posição do slider de áudio."""
@@ -258,9 +272,9 @@ class PDFPlayer:
         except:
             print("next sound failed")
 
-    def update_text_label(self, new_text: list):
+    def set_screen_text(self, new_text: list):
         """
-        Atualiza a caixa de texto com o novo texto da página atual do PDF.
+        Define o texto da caixa de texto com o da página atual do PDF.
         
         Args:
             new_text (list): O novo texto a ser exibido no rótulo de texto.
@@ -306,9 +320,12 @@ class PDFPlayer:
             filename (str): O caminho do arquivo PDF.
         """
         pygame.mixer.music.unload()
-        new_text, _ = self.convert_pdf_to_audio(current_page, filename)
+
+        new_text, _ = self.convert_pdf_to_text(current_page, filename)
+        self.convert_text_to_audio(new_text)
+        
         pygame.mixer.music.load(sound_current)
-        self.update_text_label(new_text)
+        self.set_screen_text(new_text)
         self.audio_slider.set(0)
         pygame.mixer.music.play(loops=0, start=0)
         self.button_play_pause.config(text="Pause")
