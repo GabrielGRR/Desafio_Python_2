@@ -10,7 +10,6 @@ import pygame
 import tkinter as tk
 from tkinter import filedialog
 
-
 class PDFPlayer:
     """
     Uma classe para criar um audio player de PDF usando Tkinter.
@@ -40,7 +39,7 @@ class PDFPlayer:
         self._InitMixer()
         self._InitGUI()
 
-        # TODO: estudar paralelismo e concorrencia
+        #inicia uma nova thread daemon que executa o método position_updater, permitindo que essa operação ocorra em paralelo, sem 'congelar' a aplicação inteira. 
         threading.Thread(target=self.position_updater, daemon=True).start()
 
     # Funções de uso interno
@@ -330,7 +329,7 @@ class PDFPlayer:
             self.page_label.config(text=f"/{self.number_of_pages}")
             self.filename = filename
 
-#TODO: Explicar o pq se usa __name__ == __main__
+
 if __name__ == "__main__":
     # Criação da janela 'raiz' pela biblioteca tkinter
     root = tk.Tk()
