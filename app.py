@@ -24,13 +24,13 @@ class PDFPlayer:
         
         # Definição dos parâmetros da instância da classe (Equivalente a variáveis globais, mas dentro de uma classe).
         self.max_palavras_linha = 13
-        self.filename = ""
+        self.pdf_file_path = ""
         self.current_page = 1
         self.number_of_pages = 1
         self.is_dragging_slider = False
         self.music_loaded = False
-        self.sound_current = 'results/sound/current.wav'                
-        self.page_text, self.number_of_pages = self.convert_pdf_to_text(self.current_page, self.filename)
+        self.current_sound = 'results/sound/current.wav'                
+        self.page_text, self.number_of_pages = self.convert_pdf_to_text(self.current_page, self.pdf_file_path)
 
         # Por conveção do tkinter, a janela principal é chamada de janela raiz, portanto, root
         self.root = root
@@ -146,7 +146,7 @@ class PDFPlayer:
         return self.audio_slider.get()
 
     def get_audio_length(self):
-        return pygame.mixer.Sound(self.sound_current).get_length()
+        return pygame.mixer.Sound(self.current_sound).get_length()
     
     def thread_check(self):
         """Checa se as threads foram corretamente inicializados."""
@@ -159,24 +159,37 @@ class PDFPlayer:
 
 
     # Métodos 'Setter'
-    def convert_pdf_to_text(self, num_page: int, filename: str) -> tuple[str, int]:
+    def browse_file(self):
+        """Opens a file dialog for the user to select a PDF file."""
+
+        pdf_file_path = filedialog.askopenfilename(initialdir="/", 
+                                              title="Select a File", 
+                                              filetypes=(("PDF files", "*.pdf*"), ("all files", "*.*")))
+
+        if pdf_file_path != "":
+            self.current_page = 1
+            self.set_new_page(self.current_page, 'results/sound/current.wav', pdf_file_path)
+            self.page_label.config(text=f"/{self.number_of_pages}")
+            self.pdf_file_path = pdf_file_path
+
+    def convert_pdf_to_text(self, num_page: int, pdf_file_path: str) -> tuple[str, int]:
         """
         Converte uma página especificada de um arquivo PDF para texto e salva como um arquivo de áudio.
             num_page (int): O número da página a ser convertida.
-            filename (str): O caminho para o arquivo PDF.
+            pdf_file_path (str): O caminho para o arquivo PDF.
             Try-Exception: Se houver um erro ao ler o arquivo PDF ou se a pessoa sair da caixa de diálogo 
             browse_file ao buscar um PDF.
         
         Args:
             num_page (int): A página do PDF a ser convertida.
-            filename (str): O caminho do arquivo PDF.
+            pdf_file_path (str): O caminho do arquivo PDF.
 
         Returns:
             tupla: Uma tupla contendo o texto extraído(str) e o número total de páginas (int).
         """
 
         try:
-            reader = PdfReader(filename)
+            reader = PdfReader(pdf_file_path)
             self.number_of_pages = len(reader.pages)
             page = reader.pages[num_page-1]
             text = page.extract_text()
@@ -200,28 +213,6 @@ class PDFPlayer:
         tts = pyttsx3.init()
         tts.save_to_file(text, 'results/sound/current.wav')
         tts.runAndWait()
-
-    def position_updater(self, val=None):
-        """Atualiza continuamente a posição do slider de áudio."""
-        
-        while True:
-            time.sleep(1)
-            if self.get_is_playing() and not self.is_dragging_slider:
-                pos = self.audio_slider.get() + 1
-                self.audio_slider.set(pos)
-                self.thread_check()
-
-    # Eventos de mouse ao interagir com o slider
-    def slider_click(self, event=None):
-        self.is_dragging_slider = True
-        pygame.mixer.music.stop()
-
-    # Eventos de mouse ao interagir com o slider
-    def slider_release(self, event=None):
-        if self.is_dragging_slider:
-            pygame.mixer.music.play(loops=0, start=self.get_paused_pos())
-            pygame.mixer.music.set_pos(self.get_paused_pos())
-            self.is_dragging_slider = False
 
     def play_pause(self):
         """
@@ -254,7 +245,7 @@ class PDFPlayer:
         try:
             if self.current_page != 1:
                 self.current_page -= 1
-                self.new_page_conversion(self.current_page, 'results/sound/current.wav', self.filename)
+                self.set_new_page(self.current_page, 'results/sound/current.wav', self.pdf_file_path)
             else:
                 print("current page is already 1")
         except:
@@ -266,11 +257,46 @@ class PDFPlayer:
         try:
             if self.current_page != self.number_of_pages:
                 self.current_page += 1
-                self.new_page_conversion(self.current_page, 'results/sound/current.wav', self.filename)
+                self.set_new_page(self.current_page, 'results/sound/current.wav', self.pdf_file_path)
             else:
                 print("current page is already last")
         except:
             print("next sound failed")
+
+    def navigate_to_page(self, event=None):
+        """Atualiza a pagina atual para a que o usuário digitou."""
+
+        try:
+            new_page = int(self.page_input.get())
+            if 1 <= new_page <= self.number_of_pages:
+                self.set_new_page(new_page, 'results/sound/current.wav', self.pdf_file_path)
+                self.current_page = new_page
+            else:
+                print("Invalid page number")
+        except ValueError:
+            print("Invalid input")
+
+    def position_updater(self, val=None):
+        """Atualiza continuamente a posição do slider de áudio."""
+        
+        while True:
+            time.sleep(1)
+            if self.get_is_playing() and not self.is_dragging_slider:
+                pos = self.audio_slider.get() + 1
+                self.audio_slider.set(pos)
+                self.thread_check()
+
+    # Eventos de mouse ao interagir com o slider
+    def slider_click(self, event=None):
+        self.is_dragging_slider = True
+        pygame.mixer.music.stop()
+
+    # Eventos de mouse ao interagir com o slider
+    def slider_release(self, event=None):
+        if self.is_dragging_slider:
+            pygame.mixer.music.play(loops=0, start=self.get_paused_pos())
+            pygame.mixer.music.set_pos(self.get_paused_pos())
+            self.is_dragging_slider = False
 
     def set_screen_text(self, new_text: list):
         """
@@ -279,7 +305,7 @@ class PDFPlayer:
         Args:
             new_text (list): O novo texto a ser exibido no rótulo de texto.
         """
-        
+        # Adiciona o texto que está em linha na tela e limita a quantidade de palavras máxima por linha
         total_count = 0
         word_counter = 0
         lines = new_text.split()
@@ -289,62 +315,48 @@ class PDFPlayer:
                 lines.insert(total_count, "\n")
                 word_counter = 0
             total_count += 1
-
         text_content = " ".join(lines)
+
+        # Apaga o texto anterior e adiciona o atual
         self.text_widget.config(state=tk.NORMAL)
         self.text_widget.delete("1.0", tk.END)
         self.text_widget.insert(tk.END, text_content)
         self.text_widget.tag_add("center", "1.0", "end")
         self.text_widget.config(state=tk.DISABLED)
-
-    def navigate_to_page(self, event=None):
-        """Atualiza a pagina atual para a que o usuário digitou."""
-
-        try:
-            new_page = int(self.page_input.get())
-            if 1 <= new_page <= self.number_of_pages:
-                self.new_page_conversion(new_page, 'results/sound/current.wav', self.filename)
-                self.current_page = new_page
-            else:
-                print("Invalid page number")
-        except ValueError:
-            print("Invalid input")
-
-    def new_page_conversion(self, current_page: int, sound_current: str, filename: str):
+        
+    def set_new_page(self, current_page: int, current_sound: str, pdf_file_path: str):
         """
         Faz a conversão de um arquivo PDF em texto e áudio e reprodução de uma nova página no PDF.
 
         Args:
             current_page (int): A página do PDF a ser convertida.
-            sound_current (str): O caminho do arquivo de aúdio.
-            filename (str): O caminho do arquivo PDF.
+            current_sound (str): O caminho do arquivo de aúdio.
+            pdf_file_path (str): O caminho do arquivo PDF.
         """
+        # Descarrega o áudio anterior 
         pygame.mixer.music.unload()
 
-        new_text, _ = self.convert_pdf_to_text(current_page, filename)
+        # Converte a página do arquivo PDF em texto e áudio
+        new_text, _ = self.convert_pdf_to_text(current_page, pdf_file_path)
         self.convert_text_to_audio(new_text)
-        
-        pygame.mixer.music.load(sound_current)
+
+        # Carrega o novo arquivo de áudio
+        pygame.mixer.music.load(current_sound)
+
+        # Define o texto da tela
         self.set_screen_text(new_text)
+        
+        # Reseta posição do slider
         self.audio_slider.set(0)
-        pygame.mixer.music.play(loops=0, start=0)
-        self.button_play_pause.config(text="Pause")
+        self.audio_slider.configure(to=self.get_audio_length())
+        
+        # Garante que o número da pagina na caixa de input esteja correto
         self.page_input.delete(0, tk.END)
         self.page_input.insert(0, f"{current_page}")
-        self.audio_slider.configure(to=self.get_audio_length())
 
-    def browse_file(self):
-        """Opens a file dialog for the user to select a PDF file."""
-
-        filename = filedialog.askopenfilename(initialdir="/", 
-                                              title="Select a File", 
-                                              filetypes=(("PDF files", "*.pdf*"), ("all files", "*.*")))
-
-        if filename != "":
-            self.current_page = 1
-            self.new_page_conversion(self.current_page, 'results/sound/current.wav', filename)
-            self.page_label.config(text=f"/{self.number_of_pages}")
-            self.filename = filename
+        # Inicia 'automaticamente' o áudio
+        pygame.mixer.music.play(loops=0, start=0)
+        self.button_play_pause.config(text="Pause")
 
 
 if __name__ == "__main__":
