@@ -122,7 +122,7 @@ class PDFPlayer:
         button_frame.pack(side=tk.LEFT, anchor="center", expand=True)
 
         # Botão de voltar página
-        button_prev = tk.Button(button_frame, text="Prev", command=self.prev_sound)
+        button_prev = tk.Button(button_frame, text="Prev", command=self.prev_page)
         button_prev.pack(side=tk.LEFT, padx=3)
 
         # Botão de toggle de pausar e tocar áudio
@@ -130,7 +130,7 @@ class PDFPlayer:
         self.button_play_pause.pack(side=tk.LEFT, padx=3)
 
         # Botão de avançar página
-        button_next = tk.Button(button_frame, text="Next", command=self.next_sound)
+        button_next = tk.Button(button_frame, text="Next", command=self.next_page)
         button_next.pack(side=tk.LEFT, padx=3)
 
         # Botão de selecionar arquivo PDF
@@ -221,7 +221,7 @@ class PDFPlayer:
         except Exception as e:
             print(f"play music failed: {e}")
 
-    def prev_sound(self):
+    def prev_page(self):
         """Navega para a página anterior."""
         
         # TODO 5: Navega para a página anterior
@@ -229,7 +229,7 @@ class PDFPlayer:
         # OBS: Não pode navegar para páginas abaixo de 1
         # Dica: utilizar set_new_page
 
-    def next_sound(self):
+    def next_page(self):
         """Navega para a próxima página."""
                 
         # TODO 6: Navega para a próxima página
