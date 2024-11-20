@@ -30,6 +30,6 @@ PDFPlayer/
 ```
 
 ## Known Issues
-[ ] Thread Safety: Some threading issues might occur with slider updates.
-[ ] Audio garbage: The best practice is to create the .wav audio file in the OS temp folder.
-[ ] GUI Responsiveness: Limited testing on different screen sizes.
+- [ ] Thread Safety: Some threading issues might occur with slider updates.
+- [ ] Audio garbage: The best practice is to create the .wav audio file in the OS temp folder.
+- [ ] GUI Responsiveness: Limited testing on different screen sizes.
