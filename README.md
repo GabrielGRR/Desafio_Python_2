@@ -16,18 +16,18 @@ This tool is designed to assist users in listening to their PDF documents and na
 6. **Run the program**: `python main.py`
 
 ## File Structure
-
-PDFPlayer/ <br>
-├── app.py          # Main application file <br>
-├── results/ <br>
-│   └── sound/             # Directory for generated audio files <br>
-│       └── current.wav    # Current page audio file <br>
-│       └── pdf.wav        # Default audio file <br>
-├── docs/ <br>
-│   └── images/            # Icons and additional resources <br>
-│       └── OrangePD_icon2.ico <br>
-└── requirements.txt       # List of dependencies <br>
-
+```
+PDFPlayer/
+├── app.py          # Main application file
+├── results/
+│   └── sound/             # Directory for generated audio files 
+│       └── current.wav    # Current page audio file 
+│       └── pdf.wav        # Default audio file
+├── docs/
+│   └── images/            # Icons and additional resources
+│       └── OrangePD_icon2.ico
+└── requirements.txt       # List of dependencies
+```
 
 ## Known Issues
 [ ] Thread Safety: Some threading issues might occur with slider updates.
