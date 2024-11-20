@@ -17,16 +17,16 @@ This tool is designed to assist users in listening to their PDF documents and na
 
 ## File Structure
 
-PDFPlayer/
-├── app.py          # Main application file
-├── results/
-│   └── sound/             # Directory for generated audio files
-│       └── current.wav    # Current page audio file
-│       └── pdf.wav        # Default audio file
-├── docs/
-│   └── images/            # Icons and additional resources
-│       └── OrangePD_icon2.ico
-└── requirements.txt       # List of dependencies
+PDFPlayer/ <br>
+├── app.py          # Main application file <br>
+├── results/ <br>
+│   └── sound/             # Directory for generated audio files <br>
+│       └── current.wav    # Current page audio file <br>
+│       └── pdf.wav        # Default audio file <br>
+├── docs/ <br>
+│   └── images/            # Icons and additional resources <br>
+│       └── OrangePD_icon2.ico <br>
+└── requirements.txt       # List of dependencies <br>
 
 
 ## Known Issues
