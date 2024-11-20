@@ -12,9 +12,9 @@ from tkinter import filedialog
 
 class PDFPlayer:
     """
-    Uma classe para criar um audio player de PDF usando Tkinter.
+    PDF player with a GUI.
 
-    Uso esperado:
+    Expected usage:
         root = tk.Tk()
         app = PDFPlayer(root)
         root.mainloop()
