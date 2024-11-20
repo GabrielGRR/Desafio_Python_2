@@ -168,11 +168,8 @@ class PDFPlayer:
         pass # Deletar futuramente        
 
     def convert_pdf_to_text(self, num_page: int, pdf_file_path: str) -> tuple[str, int]:
-
         """
         Converte uma página especificada de um arquivo PDF para texto.
-            num_page (int): O número da página a ser convertida.
-            pdf_file_path (str): O caminho para o arquivo PDF.
         
         Args:
             num_page (int): A página do PDF a ser convertida.
@@ -194,8 +191,6 @@ class PDFPlayer:
     def convert_text_to_audio(self, text: str):
         """
         Converte um texto em um áudio .wav via TTS na pasta 'results/sound/'.
-
-        Args:
             text (str): O texto a ser convertido em áudio.
         """
         
