@@ -8,7 +8,7 @@ This tool is designed to assist users in listening to their PDF documents and na
 
 ## ⚙ Starting the project
 
-1. **Copy the files from this repository to your machine**: `git clone https://github.com/GabrielGRR/Desafio_Python_2.git`
+1. **Copy the files to your machine**: `git clone https://github.com/GabrielGRR/Desafio_Python_2.git`
 2. **Navigate into the folder**: `cd Desafio_Python_2`
 3. **Create your virtual environment**: `python -m venv venv`
 4. **Activate your virtual environment**: `venv/Scripts/Activate`
